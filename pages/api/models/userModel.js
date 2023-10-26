@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { string } from "yup";
 
 const userSchema = new mongoose.Schema({
     fullName: {
@@ -25,7 +26,9 @@ const userSchema = new mongoose.Schema({
     avatar: {
         type: String,
         default: "/images/default-user-avatar.png"
-    }
+    },
+    verifyToken: String,
+    verifyTokenExpiry: Date,
 }, {timestamps: true});
 const User = mongoose.models.user || mongoose.model("user", userSchema);
 export default User;

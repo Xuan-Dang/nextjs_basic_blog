@@ -38,7 +38,7 @@ const userRegisterSchema = yup.object({
 });
 function Register() {
   const [error, setError] = useState("");
-  const {state, dispatch} = useContext(DataContext)
+  const { state, dispatch } = useContext(DataContext);
   const {
     register,
     handleSubmit,
@@ -60,7 +60,10 @@ function Register() {
         timeout: 1500,
         headers: { "content-type": "application/x-www-form-urlencoded" },
       });
-      dispatch({type: "NOTIFY", payload: {message: res.message, success: true, active: true}})
+      dispatch({
+        type: "NOTIFY",
+        payload: { message: res.message, success: true, active: true },
+      });
       reset();
     } catch (err) {
       setError(err.message);
