@@ -1,4 +1,5 @@
 import * as yup from "yup";
+
 const registerSchema = yup.object({
   fullName: yup.string().required("Vui lòng nhập họ tên"),
   email: yup
@@ -24,9 +25,30 @@ const registerSchema = yup.object({
     },
   }),
 });
+
 export async function registerValidate(data) {
   try {
     await registerSchema.validate(data);
+    return null;
+  } catch (err) {
+    return {
+      code: 422,
+      message: err.message,
+    };
+  }
+}
+
+const loginSchema = yup.object({
+  email: yup
+    .string()
+    .required("Vui lòng nhập email")
+    .email("Email không hợp lệ"),
+  password: yup.string().required("Vui lòng nhập email"),
+});
+
+export async function loginValidate(data) {
+  try {
+    await loginSchema.validate(data);
     return null;
   } catch (err) {
     return {

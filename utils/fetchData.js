@@ -27,7 +27,13 @@ instance.interceptors.response.use(
     // Bất kì mã trạng thái nào lọt ra ngoài tầm 2xx đều khiến hàm này được trigger\
     // Làm gì đó với lỗi response
     console.log("error: ", error);
-    return Promise.reject(error.response.data);
+    if (error.response && error.response.data) {
+      return Promise.reject(error.response.data);
+    }
+    return Promise.reject({
+      code: 400,
+      message: "Có gì đó không ổn",
+    });
   }
 );
 export async function getData(url, config) {

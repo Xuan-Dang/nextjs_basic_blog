@@ -4,6 +4,15 @@ import User from "../models/userModel";
 db();
 
 export default async function (req, res) {
+  switch (req.method) {
+    case "POST": {
+      await verifyEmail(req, res);
+      break;
+    }
+  }
+}
+
+async function verifyEmail(req, res) {
   try {
     const { token } = req.body;
 
@@ -23,11 +32,11 @@ export default async function (req, res) {
     user.verifyToken = null;
     user.verifyTokenExpiry = null;
     await user.save();
-    
-    return res.statsu(200).json({
+
+    return res.status(200).json({
       code: 200,
-      message: "Xác thực email thành công"
-    })
+      message: "Xác thực email thành công",
+    });
   } catch (error) {
     return res.status(500).json({
       code: 500,

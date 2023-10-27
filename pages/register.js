@@ -4,12 +4,14 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Card from "react-bootstrap/Card";
 import Link from "next/link";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, lazy, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { postData } from "../utils/fetchData";
 import { DataContext } from "@/context/AppProviders";
+import { useRouter } from "next/router";
+const Spinner = lazy(() => import("react-bootstrap/Spinner"));
 
 const userRegisterSchema = yup.object({
   fullName: yup.string().required("Vui lòng nhập họ tên"),
@@ -36,9 +38,13 @@ const userRegisterSchema = yup.object({
     },
   }),
 });
+
 function Register() {
   const [error, setError] = useState("");
   const { state, dispatch } = useContext(DataContext);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -54,21 +60,27 @@ function Register() {
       confirmPassword: "",
     },
   });
+
   const registerSubmit = async (data) => {
     try {
+      setIsLoading(true);
       const res = await postData("/auth/register", data, {
         timeout: 3600,
         headers: { "content-type": "application/x-www-form-urlencoded" },
       });
+      setIsLoading(false);
       dispatch({
         type: "NOTIFY",
-        payload: { message: res.message, success: true, active: true },
+        payload: { message: res.message, success: true },
       });
       reset();
+      router.push("/login");
     } catch (err) {
+      setIsLoading(false);
       setError(err.message);
     }
   };
+
   useEffect(() => {
     if (error) {
       setTimeout(() => {
@@ -141,7 +153,16 @@ function Register() {
               {error ? error : ""}
             </Form.Text>
             <Button variant="dark" type="submit" className="w-100">
-              Đăng ký
+              Đăng ký{" "}
+              {isLoading && (
+                <Suspense>
+                  <Spinner
+                    animation="grow"
+                    variant="light"
+                    style={{ width: "16px", height: "16px", marginLeft: "7px" }}
+                  />
+                </Suspense>
+              )}
             </Button>
             <p className="mb-0 mt-3">
               Bạn đã có tài khoản?{" "}

@@ -20,6 +20,7 @@ async function register(req, res) {
     const validate = await middleware.registerValidate(req.body);
 
     if (validate) return res.status(422).json(validate);
+
     const userByEmail = await User.findOne({ email: req.body.email });
 
     console.log(userByEmail);
@@ -37,14 +38,14 @@ async function register(req, res) {
 
     const newUser = await User.create({ ...req.body, password: hashPassword });
 
-    await sendVerifyEmail({email: req.body.email, userId: newUser._id})
+    await sendVerifyEmail({ email: req.body.email, userId: newUser._id });
 
     return res.status(200).json({
       code: 200,
       message: "Đăng ký thành công",
     });
   } catch (err) {
-    console.log("Register error: ", err)
+    console.log("Register error: ", err);
     return res.status(500).json({
       code: 500,
       message: "Internal server error",

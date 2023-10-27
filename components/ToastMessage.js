@@ -1,44 +1,32 @@
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useState } from "react";
 import { DataContext } from "@/context/AppProviders";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function ToastMessage() {
   const { state, dispatch } = useContext(DataContext);
-  const successNotify = () => {
-    return toast.success(state.notify.message, {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-    });
-  };
-  const errorNotify = () => {
-    return toast.error(state.noify.message, {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-    });
-  };
+  const [toastOption, setToastOption] = useState({
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+  });
+
   useEffect(() => {
-    if(state.notify.active) {
-        if(state.notify.success) {
-            successNotify()
-        }else {
-            errorNotify()
-        }
-        dispatch({type: "NOTIFY", payload: {message: "", success: false, active: false}});
+    if (state.notify.success) {
+      toast.success(state.notify.message, toastOption);
+    } else {
+      toast.error(state.notify.message, toastOption);
     }
-  }, [state])
+    setTimeout(() => {
+      dispatch({ type: "NOTIFY", payload: { message: "", success: false } });
+    }, 5000);
+  }, []);
+
   return (
     <div>
       <ToastContainer
