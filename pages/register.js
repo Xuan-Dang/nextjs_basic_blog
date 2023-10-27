@@ -57,7 +57,7 @@ function Register() {
   const registerSubmit = async (data) => {
     try {
       const res = await postData("/auth/register", data, {
-        timeout: 1500,
+        timeout: 3600,
         headers: { "content-type": "application/x-www-form-urlencoded" },
       });
       dispatch({
