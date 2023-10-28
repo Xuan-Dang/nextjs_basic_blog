@@ -61,7 +61,7 @@ function Register() {
     },
   });
 
-  const registerSubmit = async (data) => {
+  const handleRegister = async (data) => {
     try {
       setIsLoading(true);
       const res = await postData("/auth/register", data, {
@@ -97,7 +97,7 @@ function Register() {
       <Card className="mx-auto" style={{ maxWidth: "400px" }}>
         <Card.Body>
           <Card.Title className="text-center">Đăng ký</Card.Title>
-          <Form onSubmit={handleSubmit(registerSubmit)}>
+          <Form onSubmit={handleSubmit(handleRegister)}>
             <Form.Group className="mb-3" controlId="fullName">
               <Form.Label>Họ và tên</Form.Label>
               <Form.Control

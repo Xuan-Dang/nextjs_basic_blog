@@ -1,4 +1,5 @@
 const ACTIONS = {
-    NOTIFY: "NOTIFY"
+    NOTIFY: "NOTIFY",
+    USER: "USER"
 }
 export default ACTIONS;
