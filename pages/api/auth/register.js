@@ -23,8 +23,6 @@ async function register(req, res) {
 
     const userByEmail = await User.findOne({ email: req.body.email });
 
-    console.log(userByEmail);
-
     if (userByEmail) {
       return res.status(400).json({
         code: 400,
@@ -45,7 +43,6 @@ async function register(req, res) {
       message: "Đăng ký thành công",
     });
   } catch (err) {
-    console.log("Register error: ", err);
     return res.status(500).json({
       code: 500,
       message: "Internal server error",

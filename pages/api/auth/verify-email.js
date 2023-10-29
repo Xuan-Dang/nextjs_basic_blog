@@ -22,7 +22,7 @@ async function verifyEmail(req, res) {
     });
 
     if (!user) {
-      return res.statsu(400).json({
+      return res.status(400).json({
         code: 400,
         message: "Mã xác thực không hợp lệ",
       });

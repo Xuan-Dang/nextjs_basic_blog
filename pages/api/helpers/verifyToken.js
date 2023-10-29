@@ -1,58 +1,67 @@
 import User from "../models/userModel";
 import jwt from "jsonwebtoken";
 import { createAccessToken } from "./generateToken";
-export async function verifyRefreshToken(body) {
-  try {
+
+export function verifyRefreshToken(body) {
+  return new Promise((resolve, reject) => {
     const { refreshToken } = body;
 
     if (!refreshToken)
-      return {
-        error: {
-          code: 403,
-          message: "Vui lòng đăng nhập",
-        },
-      };
+      return reject({
+        code: 400,
+        message: "Vui lòng đăng nhập để tiếp tục",
+      });
 
-    const result = jwt.verify(
+    jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET,
-      (err, decode) => {
-        if (err && err.message === "jwt expired") {
-          return { error: err.mesasage };
-        } else if (err) {
-          return { error: "Token không hợp lệ, vui lòng đăng nhập lại" };
+      async (err, decode) => {
+        try {
+          if (err && err.message === "jwt expired")
+            return reject({
+              code: 400,
+              message: err.message,
+            });
+
+          if (err)
+            return reject({
+              code: 400,
+              message: "Token không hợp lệ",
+            });
+
+          const userById = await User.findOne({ _id: decode.userId });
+
+          if (!userById)
+            return reject({
+              code: 404,
+              message: "Không tìm thấy người dùng",
+            });
+
+          const {
+            __v,
+            createdAt,
+            updatedAt,
+            verifyToken,
+            verifyTokenExpiry,
+            isVerified,
+            password,
+            ...user
+          } = userById._doc;
+
+          const newAccessToken = await createAccessToken({ userId: user._id });
+
+          return resolve({
+            accessToken: newAccessToken,
+            user: { ...user },
+          });
+        } catch (err) {
+          if (err)
+            return reject({
+              code: 500,
+              message: "Lỗi máy chủ",
+            });
         }
-        return { decode: decode };
       }
     );
-
-    if (result.error) return { error: result.error };
-
-    const userById = await User.findOne({ _id: result.decode.userId });
-
-    if (!userById)
-      return {
-        error: {
-          code: 404,
-          message: "Không tìm thấy người dùng",
-        },
-      };
-
-    const {
-      __v,
-      createdAt,
-      updatedAt,
-      verifyToken,
-      verifyTokenExpiry,
-      isVerified,
-      password,
-      ...user
-    } = userById._doc;
-
-    const accessToken = await createAccessToken({ userId: user._id });
-
-    return { user: { ...user, accessToken } };
-  } catch (err) {
-    return { error: err.message };
-  }
+  });
 }

@@ -11,6 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { postData } from "../utils/fetchData";
 import { Spinner } from "react-bootstrap";
+import { useRouter } from "next/router";
 
 const userLoginSchema = yup.object({
   email: yup
@@ -24,6 +25,7 @@ function Login() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { state, dispatch } = useContext(DataContext);
+  const router = useRouter();
 
   const {
     register,
@@ -59,6 +61,7 @@ function Login() {
           success: true,
         },
       });
+      router.push("/profile");
     } catch (err) {
       setIsLoading(false);
       setError(err.message);
@@ -72,6 +75,13 @@ function Login() {
       }, 5000);
     }
   }, [error]);
+
+  useEffect(() => {
+    if (localStorage.getItem("is_login")) {
+      const isLogin = JSON.parse(localStorage.getItem("is_login"));
+      if (isLogin) router.push("/profile");
+    }
+  }, []);
 
   return (
     <Layout>

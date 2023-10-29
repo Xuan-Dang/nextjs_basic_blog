@@ -1,20 +1,31 @@
-import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import InputGroup from "react-bootstrap/InputGroup";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import NavDropdown from 'react-bootstrap/NavDropdown';
+import Dropdown from "react-bootstrap/Dropdown";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/router";
+import { useState, useEffect, useContext } from "react";
+import { DataContext } from "@/context/AppProviders";
 
 function AppNavbar() {
+  const { state, dispatch } = useContext(DataContext);
+  const { user } = state;
+
   const route = useRouter();
+
   const isActiveLink = (url) => {
     const isActive = route.asPath === url ? "active" : "";
     return isActive;
-  }
+  };
+
+  const handleLogout = () => {
+    dispatch({ type: "USER", payload: {} });
+    localStorage.removeItem("rf_token");
+    localStorage.removeItem("is_login");
+    route.push("/login");
+  };
   return (
     <>
       <Navbar key="lg" expand="lg" className="bg-body-tertiary mb-3">
@@ -38,25 +49,56 @@ function AppNavbar() {
                 <Link className={`nav-link ${isActiveLink("/")}`} href="/">
                   Home
                 </Link>
-                <Link className={`nav-link ${isActiveLink("/product")}`} href="/product">
+                <Link
+                  className={`nav-link ${isActiveLink("/product")}`}
+                  href="/product"
+                >
                   Sản phẩm
                 </Link>
-                <Link className={`nav-link ${isActiveLink("/login")}`} href="/login">
-                  Đăng nhập
-                </Link>
-                {/* <NavDropdown
-                  title="User"
-                  id={`offcanvasNavbarDropdown-expand-lg`}
-                >
-                  <Link className="dropdown-item" href="#action3">Action</Link>
-                  <Link className="dropdown-item" href="#action4">
-                    Another action
+
+                {Object.keys(user).length === 0 ? (
+                  <Link
+                    className={`nav-link ${isActiveLink("/login")}`}
+                    href="/login"
+                  >
+                    Đăng nhập
                   </Link>
-                  <NavDropdown.Divider />
-                  <Link className="dropdown-item" href="#action5">
-                    Something else here
-                  </Link>
-                </NavDropdown> */}
+                ) : (
+                  <Dropdown data-bs-theme="transparent">
+                    <Dropdown.Toggle
+                      id="user-dropdown"
+                      variant="transparent"
+                      className="border-0 px-2 py-1 d-flex align-items-center"
+                    >
+                      <span
+                        className="d-block"
+                        style={{
+                          width: "30px",
+                          height: "30px",
+                          borderRadius: "50%",
+                          overflow: "hidden",
+                          position: "relative",
+                        }}
+                      >
+                        <Image
+                          src={user.avatar}
+                          fill
+                          alt={`${user.fullName} avatar`}
+                          style={{ objectFit: "cover" }}
+                        />{" "}
+                      </span>
+                      <span className="d-block ms-2">{user.fullName}</span>
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu style={{ left: "unset", right: "0" }}>
+                      <Dropdown.Item href="/profile">Hồ sơ</Dropdown.Item>
+                      <Dropdown.Divider />
+                      <Dropdown.Item onClick={handleLogout}>
+                        Đăng Xuất
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                )}
               </Nav>
               {/* <Form className="d-flex">
                 <InputGroup>

@@ -73,7 +73,6 @@ async function login(req, res) {
       user: { ...user, accessToken, refreshToken },
     });
   } catch (err) {
-    console.log(err);
     return res.status(500).json({
       code: 500,
       message: "Internal server error",
