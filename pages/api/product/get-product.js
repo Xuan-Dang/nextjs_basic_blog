@@ -15,7 +15,7 @@ export default async function (req, res) {
 
 async function getProduct(req, res) {
   try {
-    const products = await Product.find().populate({path: "variantId", select: "price onSale"})
+    const products = await Product.find({}, "-__v -variantId");
     return res.status(200).json({
       code: 200,
       products,

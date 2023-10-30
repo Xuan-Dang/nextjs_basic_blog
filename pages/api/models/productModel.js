@@ -26,7 +26,15 @@ const productSchema = new mongoose.Schema(
     variantId: {
       type: Array,
       default: [],
-      ref: "product_variant"
+      ref: "product_variant",
+    },
+    minPrice: {
+      type: Number,
+      default: 0,
+    },
+    maxPrice: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }
