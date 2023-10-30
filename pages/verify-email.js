@@ -28,6 +28,7 @@ function verifyEmail() {
       verifyEmail();
     }
   }, [token]);
+  
   return (
     <Layout>
       <Head>

@@ -91,7 +91,9 @@ function AppNavbar() {
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu style={{ left: "unset", right: "0" }}>
-                      <Dropdown.Item href="/profile">Hồ sơ</Dropdown.Item>
+                      <Link className="dropdown-item" href="/profile">
+                        Hồ sơ
+                      </Link>
                       <Dropdown.Divider />
                       <Dropdown.Item onClick={handleLogout}>
                         Đăng Xuất

@@ -89,6 +89,13 @@ function Register() {
     }
   }, [error]);
 
+  useEffect(() => {
+    if (localStorage.getItem("is_login")) {
+      const isLogin = JSON.parse(localStorage.getItem("is_login"));
+      isLogin && router.push("/profile");
+    }
+  }, []);
+
   return (
     <Layout>
       <Head>

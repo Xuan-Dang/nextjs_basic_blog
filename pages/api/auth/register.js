@@ -19,7 +19,7 @@ async function register(req, res) {
   try {
     const validate = await middleware.registerValidate(req.body);
 
-    if (validate) return res.status(422).json(validate);
+    if (validate) return res.status(validate.code).json(validate);
 
     const userByEmail = await User.findOne({ email: req.body.email });
 

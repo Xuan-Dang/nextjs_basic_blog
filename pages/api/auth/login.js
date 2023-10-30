@@ -28,7 +28,7 @@ async function login(req, res) {
       password: bodyPassword,
     });
 
-    if (validate) return res.status(422).json(validate);
+    if (validate) return res.status(validate.code).json(validate);
 
     const userByEmail = await User.findOne({ email: bodyEmail });
 
@@ -41,7 +41,7 @@ async function login(req, res) {
     const isMatch = bcrypt.compareSync(bodyPassword, userByEmail.password);
 
     if (!isMatch)
-      return res.status(422).json({
+      return res.status(400).json({
         code: 400,
         message: "Mật khẩu không chính xác, vui lòng kiểm tra lại",
       });

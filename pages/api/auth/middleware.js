@@ -32,7 +32,7 @@ export async function registerValidate(data) {
     return null;
   } catch (err) {
     return {
-      code: 422,
+      code: 400,
       message: err.message,
     };
   }
@@ -52,7 +52,7 @@ export async function loginValidate(data) {
     return null;
   } catch (err) {
     return {
-      code: 422,
+      code: 400,
       message: err.message,
     };
   }
