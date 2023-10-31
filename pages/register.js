@@ -42,6 +42,7 @@ const userRegisterSchema = yup.object({
 function Register() {
   const [error, setError] = useState("");
   const { state, dispatch } = useContext(DataContext);
+  const {user} = state
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -92,9 +93,9 @@ function Register() {
   useEffect(() => {
     if (localStorage.getItem("is_login")) {
       const isLogin = JSON.parse(localStorage.getItem("is_login"));
-      isLogin && router.push("/profile");
+      isLogin && router.push(`/profile/${user._id}`);
     }
-  }, []);
+  }, [user]);
 
   return (
     <Layout>

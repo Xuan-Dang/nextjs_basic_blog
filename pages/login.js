@@ -25,6 +25,7 @@ function Login() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { state, dispatch } = useContext(DataContext);
+  const { user } = state;
   const router = useRouter();
 
   const {
@@ -79,9 +80,9 @@ function Login() {
   useEffect(() => {
     if (localStorage.getItem("is_login")) {
       const isLogin = JSON.parse(localStorage.getItem("is_login"));
-      if (isLogin) router.push("/profile");
+      if (isLogin) router.push(`/profile/${user._id}`);
     }
-  }, []);
+  }, [user]);
 
   return (
     <Layout>
