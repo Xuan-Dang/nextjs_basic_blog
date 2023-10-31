@@ -5,7 +5,7 @@ function Home() {
   return (
     <Layout>
       <Head>
-        <title>Ecommerce Basic</title>
+        <title>Nextjs basic blog</title>
       </Head>
     </Layout>
   );

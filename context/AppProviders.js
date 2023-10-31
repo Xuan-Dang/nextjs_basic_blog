@@ -28,6 +28,8 @@ export function AppProviders({ children }) {
           dispatch({ type: "USER", payload: { ...data.user } });
         })
         .catch((err) => {
+          localStorage.removeItem("rf_token");
+          localStorage.removeItem("is_login");
           dispatch({
             type: "NOTIFY",
             payload: { message: err.message, success: false },

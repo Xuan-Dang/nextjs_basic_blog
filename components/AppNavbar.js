@@ -31,7 +31,7 @@ function AppNavbar() {
       <Navbar key="lg" expand="lg" className="bg-body-tertiary mb-3">
         <Container fluid>
           <Link className="navbar-brand" href="/">
-            Ecommerce Basic
+            Nextjs Basic Blog
           </Link>
           <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-lg`} />
           <Navbar.Offcanvas
@@ -41,7 +41,7 @@ function AppNavbar() {
           >
             <Offcanvas.Header closeButton>
               <Offcanvas.Title id={`offcanvasNavbarLabel-expand-lg`}>
-                Ecommerce Basic
+                Nextjs Basic Blog
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
@@ -51,9 +51,9 @@ function AppNavbar() {
                 </Link>
                 <Link
                   className={`nav-link ${isActiveLink("/product")}`}
-                  href="/product"
+                  href="/post"
                 >
-                  Sản phẩm
+                  Bài viết
                 </Link>
 
                 {Object.keys(user).length === 0 ? (
