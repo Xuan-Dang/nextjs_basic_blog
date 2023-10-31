@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const tagLookupSchema = new mongoose.Schema(
   {
-    postId: { type: String, required: true },
-    tagId: { type: String, required: true },
+    postId: { type: String, required: true, ref: "post" },
+    tagId: { type: String, required: true, ref: "tag" },
   },
   { timestamps: true }
 );
