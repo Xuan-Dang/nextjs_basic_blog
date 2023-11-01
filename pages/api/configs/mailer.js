@@ -58,3 +58,25 @@ export const sendVerifyEmail = async ({ email, userId }) => {
     throw new Error(error.message);
   }
 };
+
+export const sendResetPasswordEmail = async ({ email, userId }) => {
+  try {
+    const hashedToken = await bcrypt.hash(userId.toString(), 10);
+    await User.findByIdAndUpdate(userId, {
+      resetPasswordToken: hashedToken,
+      resetPasswordTokenExpiry: Date.now() + 360000,
+    });
+    const html = `
+    <p>Vui lòng vào liên kết sau để reset mật khẩu của bạn: ${process.env.BASE_URL}/reset-password?token=${hashedToken}</p>
+  `;
+  const resetPasswordResponse = await mailer({
+    email: email,
+    subject: "Xác thực địa chỉ email",
+    html,
+  });
+
+  return resetPasswordResponse;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};

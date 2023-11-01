@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { postData } from "../utils/fetchData";
-import { Spinner } from "react-bootstrap";
+const Spinner = lazy(() => import("react-bootstrap/Spinner"));
 import { useRouter } from "next/router";
 
 const userLoginSchema = yup.object({
@@ -46,7 +46,7 @@ function Login() {
     try {
       setIsLoading(true);
       const res = await postData("/auth/login", data, {
-        timeout: 3600,
+        timeout: 10000,
         headers: { "content-type": "application/x-www-form-urlencoded" },
       });
       const { refreshToken, ...user } = res.user;
@@ -62,7 +62,7 @@ function Login() {
           success: true,
         },
       });
-      router.push("/profile");
+      router.push(`/profile/${user._id}`);
     } catch (err) {
       setIsLoading(false);
       setError(err.message);
@@ -132,13 +132,13 @@ function Login() {
                 </Suspense>
               )}
             </Button>
-            <p className="mb-0 mt-3">
+            <p className="mb-0 mt-3" style={{fontSize: "14px"}}>
               Bạn quên mật khẩu?{" "}
               <Link href="/forgot-password" className="text-danger">
                 Lấy lại mật khẩu
               </Link>
             </p>
-            <p className="mb-0 mt-3">
+            <p className="mb-0 mt-3" style={{fontSize: "14px"}}>
               Bạn chưa có tài khoản?{" "}
               <Link href="/register" className="text-danger">
                 Đăng ký tại đây

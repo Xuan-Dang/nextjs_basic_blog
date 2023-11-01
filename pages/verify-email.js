@@ -7,7 +7,6 @@ import Head from "next/head";
 
 function verifyEmail() {
   const [token, setToken] = useState("");
-  const [verified, setVerified] = useState(false);
   const [error, setError] = useState("");
 
   const verifyEmail = async () => {
