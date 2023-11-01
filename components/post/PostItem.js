@@ -1,17 +1,44 @@
-import { Col, Card } from "react-bootstrap";
+import { Col, Card, Button } from "react-bootstrap";
+import Link from "next/link";
+import Image from "next/image";
 
-function PostItem({post}) {
+function PostItem({ post }) {
   return (
     <Col xs={12} md={6} lg={4}>
-      <Card>
-        <Card.Img variant="top" src="holder.js/100px180" />
+      <Card className="border-0 shadow-sm">
+        <Link
+          href={`/post/${post.url}.${post._id}`}
+          className="d-block position-relative"
+          style={{ height: "250px" }}
+        >
+          <Image
+            fill
+            style={{
+              width: "100%",
+              objectFit: "cover",
+              height: "100%",
+            }}
+            src={post.image}
+            className="card-img-top"
+            alt={post.title}
+          />
+        </Link>
         <Card.Body>
-          <Card.Title>Card Title</Card.Title>
-          <Card.Text>
-            Some quick example text to build on the card title and make up the
-            bulk of the card's content.
-          </Card.Text>
-          <Button variant="primary">Go somewhere</Button>
+          <Link
+            href={`/post/${post.url}.${post._id}`}
+            style={{
+              textDecoration: "none",
+            }}
+          >
+            <h2 className="card-title text-dark fs-3">{post.title}</h2>
+          </Link>
+          <Card.Text>{post.description}</Card.Text>
+          <Link
+            href={`/post/${post.url}.${post._id}`}
+            className="btn btn-primary"
+          >
+            Xem chi tiết
+          </Link>
         </Card.Body>
       </Card>
     </Col>

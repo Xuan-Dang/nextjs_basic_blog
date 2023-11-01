@@ -9,7 +9,7 @@ const postSchema = new mongoose.Schema(
     publishedAt: { type: Date, default: Date.now() },
     isPublish: { type: Boolean, default: false },
     image: { type: String, default: "/images/default-image.png" },
-    author: { type: String },
+    author: { type: String, ref: "user" },
     category: {type: String, ref: "category"},
   },
   { timestamps: true }

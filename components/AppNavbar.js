@@ -105,18 +105,6 @@ function AppNavbar() {
                   </Dropdown>
                 )}
               </Nav>
-              {/* <Form className="d-flex">
-                <InputGroup>
-                  <Form.Control
-                    placeholder="Recipient's username"
-                    aria-label="Recipient's username"
-                    aria-describedby="basic-addon2"
-                  />
-                  <Button variant="secondary" id="button-addon2">
-                    Button
-                  </Button>
-                </InputGroup>
-              </Form> */}
             </Offcanvas.Body>
           </Navbar.Offcanvas>
         </Container>

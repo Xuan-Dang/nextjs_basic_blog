@@ -133,6 +133,12 @@ function Login() {
               )}
             </Button>
             <p className="mb-0 mt-3">
+              Bạn quên mật khẩu?{" "}
+              <Link href="/forgot-password" className="text-danger">
+                Lấy lại mật khẩu
+              </Link>
+            </p>
+            <p className="mb-0 mt-3">
               Bạn chưa có tài khoản?{" "}
               <Link href="/register" className="text-danger">
                 Đăng ký tại đây

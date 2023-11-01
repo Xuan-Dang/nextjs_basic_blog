@@ -27,9 +27,14 @@ instance.interceptors.response.use(
     // Bất kì mã trạng thái nào lọt ra ngoài tầm 2xx đều khiến hàm này được trigger\
     // Làm gì đó với lỗi response
     console.log("error: ", error);
-    if (error.response && error.response.data) {
+    if (error.response && error.response.data)
       return Promise.reject(error.response.data);
-    }
+
+    if (error.code === "ECONNABORTED")
+      return Promise.reject({
+        code: 400,
+        message: "Yêu cầu hết hạn, vui lòng thử lại",
+      });
     return Promise.reject({
       code: 400,
       message: "Có gì đó không ổn",

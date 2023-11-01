@@ -1,12 +1,13 @@
 import db from "../configs/connectDB";
-import postModel from "../models/postModel";
+import Post from "../models/postModel";
+import Category from "../models/categoryModel";
 
 db();
 
 export default async function (req, res) {
   switch (req.method) {
     case "GET": {
-      return await getAllPost(req, res);
+      await getAllPost(req, res);
       break;
     }
   }
@@ -14,14 +15,16 @@ export default async function (req, res) {
 
 async function getAllPost(req, res) {
   try {
-    const posts = await postModel
-      .find({ isPublish: true }, "-__v -createdAt -updatedAt")
-      .populate({ path: "category", select: "name url" });
+    const posts = await Post.find(
+      { isPublish: true },
+      "-__v -createdAt -updatedAt"
+    ).populate({ path: "category", select: "name url" });
     return res.status(200).json({
       code: 200,
       posts,
     });
   } catch (err) {
+    console.log("err: ", err);
     return res.status(500).json({
       code: 500,
       message: "Lỗi máy chủ",
