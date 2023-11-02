@@ -21,7 +21,6 @@ function Profile() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log("Test env: ", process.env.DB_URL);
     if (localStorage.getItem("is_login")) {
       const isLogin = JSON.parse(localStorage.getItem("is_login"));
       if (!isLogin) router.push("/login");
@@ -33,7 +32,11 @@ function Profile() {
   return (
     <Layout>
       <Head>
-        <title>{`${user.fullName} - Profile`}</title>
+        <title>
+          {Object.keys(user).length > 0
+            ? `${user.fullName} - Profile`
+            : "Profile"}
+        </title>
       </Head>
       <Container fluid="lg">
         <Row>
