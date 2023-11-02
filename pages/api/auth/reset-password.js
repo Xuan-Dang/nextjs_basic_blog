@@ -1,6 +1,7 @@
 import db from "../configs/connectDB";
 import User from "../models/userModel";
 import bcrypt from "bcryptjs";
+import { resetPasswordValidate } from "./middleware";
 
 db();
 
@@ -15,7 +16,11 @@ export default async function (req, res) {
 
 async function resetPassword(req, res) {
   try {
-    const { token, password } = req.body;
+    const { token, password, confirmPassword } = req.body;
+
+    const validate = await resetPasswordValidate({ password, confirmPassword });
+
+    if (validate) return res.status(validate.code).json(validate);
 
     const user = await User.findOne({
       resetPasswordToken: token,
@@ -42,7 +47,6 @@ async function resetPassword(req, res) {
         "Bạn đã thay đổi mật khẩu thành công, bây giờ bạn có thể đăng nhập",
     });
   } catch (err) {
-    console.log(err);
     return res.statsu(500).json({
       code: 500,
       message: "Lỗi máy chủ",

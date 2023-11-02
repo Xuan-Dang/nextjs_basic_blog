@@ -48,7 +48,7 @@ export const sendVerifyEmail = async ({ email, userId }) => {
 
     const verifyEmailResponse = await mailer({
       email: email,
-      subject: "Xác thực địa chỉ email",
+      subject: "Nextjs Basic Blog - Xác thực địa chỉ email",
       html,
     });
 
@@ -69,13 +69,13 @@ export const sendResetPasswordEmail = async ({ email, userId }) => {
     const html = `
     <p>Vui lòng vào liên kết sau để reset mật khẩu của bạn: ${process.env.BASE_URL}/reset-password?token=${hashedToken}</p>
   `;
-  const resetPasswordResponse = await mailer({
-    email: email,
-    subject: "Xác thực địa chỉ email",
-    html,
-  });
+    const resetPasswordResponse = await mailer({
+      email: email,
+      subject: "Nextjs Basic Blog - Lấy lại mật khẩu",
+      html,
+    });
 
-  return resetPasswordResponse;
+    return resetPasswordResponse;
   } catch (err) {
     throw new Error(err.message);
   }

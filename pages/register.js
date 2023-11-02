@@ -42,7 +42,7 @@ const userRegisterSchema = yup.object({
 function Register() {
   const [error, setError] = useState("");
   const { state, dispatch } = useContext(DataContext);
-  const {user} = state
+  const { user } = state;
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -66,7 +66,7 @@ function Register() {
     try {
       setIsLoading(true);
       const res = await postData("/auth/register", data, {
-        timeout: 3600,
+        timeout: 10000,
         headers: { "content-type": "application/x-www-form-urlencoded" },
       });
       setIsLoading(false);

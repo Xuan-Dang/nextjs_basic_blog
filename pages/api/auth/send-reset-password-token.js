@@ -1,6 +1,7 @@
 import db from "../configs/connectDB";
 import User from "../models/userModel";
 import { sendResetPasswordEmail } from "../configs/mailer";
+import { sendResetPasswordTokenValidate } from "./middleware";
 
 db();
 
@@ -16,13 +17,19 @@ export default async function (req, res) {
 async function sendResetPasswordToken(req, res) {
   try {
     const { email } = req.body;
+    const validate = await sendResetPasswordTokenValidate({ email });
+
+    if (validate) return res.status(validate.code).json({ ...validate });
+
     const userByEmail = await User.findOne({ email: email });
     if (!userByEmail)
       return res.status(404).json({
         code: 404,
         message: "Email không chính xác, vui lòng thử lại",
       });
+
     await sendResetPasswordEmail({ email, userId: userByEmail._id });
+
     return res.status(200).json({
       code: 200,
       message:

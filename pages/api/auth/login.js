@@ -28,7 +28,7 @@ async function login(req, res) {
       password: bodyPassword,
     });
 
-    if (validate) return res.status(validate.code).json(validate);
+    if (validate) return res.status(validate.code).json({ ...validate });
 
     const userByEmail = await User.findOne({ email: bodyEmail });
 

@@ -50,19 +50,19 @@ function resetPassword() {
 
   const handleSendPassword = async (data) => {
     try {
-      setIsLoadding(true)
+      setIsLoadding(true);
       const res = await postData(
         "/auth/reset-password/",
-        { token, password: data.password },
+        { token, ...data },
         {
           timeout: 5000,
           headers: { "content-type": "application/x-www-form-urlencoded" },
         }
       );
-      setIsLoadding(false)
+      setIsLoadding(false);
       setMessage(res.message);
     } catch (err) {
-      setIsLoadding(false)
+      setIsLoadding(false);
       setMessage(err.message);
     }
   };

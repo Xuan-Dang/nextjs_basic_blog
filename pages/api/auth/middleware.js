@@ -57,3 +57,55 @@ export async function loginValidate(data) {
     };
   }
 }
+
+const sendResetPasswordTokenSchema = yup.object({
+  email: yup
+    .string()
+    .required("Vui lòng nhập email")
+    .email("Email không hợp lệ"),
+});
+
+export async function sendResetPasswordTokenValidate(data) {
+  try {
+    await sendResetPasswordTokenSchema.validate(data);
+    return null;
+  } catch (err) {
+    return {
+      code: 400,
+      message: err.message,
+    };
+  }
+}
+
+const resetPasswordSchema = yup.object({
+  password: yup
+    .string()
+    .required("Vui lòng nhập mật khẩu")
+    .min(6, "Mật khẩu phải chứa ít nhất 6 ký tự"),
+  confirmPassword: yup.string().test({
+    name: "isMatch",
+    test: (value, ctx) => {
+      if (ctx.parent.password && !value) {
+        return ctx.createError({ message: "Vui lòng xác nhận mật khẩu" });
+      }
+      if (ctx.parent.password && value !== ctx.parent.password) {
+        return ctx.createError({
+          message: "Mật khẩu không khớp, vui lòng kiểm tra lại",
+        });
+      }
+      return true;
+    },
+  }),
+});
+
+export async function resetPasswordValidate(data) {
+  try {
+    await resetPasswordSchema.validate(data);
+    return null;
+  } catch (err) {
+    return {
+      code: 400,
+      message: err.message,
+    };
+  }
+}
