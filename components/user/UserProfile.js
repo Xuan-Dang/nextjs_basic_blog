@@ -4,16 +4,9 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { DataContext } from "@/context/AppProviders";
+import Image from "next/image";
 
 const userUpdateSchema = yup.object({
-  avatar: yup.mixed().test({
-    name: "fileValidate",
-    test: (value, ctx) => {
-      console.log("ctx: ", ctx);
-      console.log("value: ", value);
-      return true;
-    },
-  }),
   fullName: yup.string().required("Họ và tên không được để trống"),
   email: yup
     .string()
@@ -48,8 +41,7 @@ const userUpdateSchema = yup.object({
 function UserProfile({ name }) {
   const { state, dispatch } = useContext(DataContext);
   const { user } = state;
-
-  console.log(user);
+  const [newAvatar, setNewAvatar] = useState(null);
 
   const {
     register,
@@ -70,17 +62,23 @@ function UserProfile({ name }) {
     setValue("fullName", user.fullName, { shouldValidate: true });
     setValue("email", user.email, { shouldValidate: true });
   }, [user]);
+
   return (
     <Tab.Pane eventKey={name}>
       <h2 className="fs-4 mb-3">Hồ sơ</h2>
       <Form>
         <Row className="mb-3">
           <Form.Group as={Col} controlId="avatar">
-            <Form.Label>Ảnh đại diện</Form.Label>
+            <Form.Label
+              className="position-relative d-block rounded-circle"
+              style={{ width: "150px", height: "150px" }}
+            >
+              <Image src={user.avatar} fill alt={`${user.avatar} avatar`} />
+            </Form.Label>
             <Form.Control
               type="file"
               name="avatar"
-              {...register("avatar")}
+              onChange={(e) => setNewAvatar(e.target.files)}
               hidden
             />
             <Form.Text className="text-danger">
