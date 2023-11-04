@@ -15,7 +15,7 @@ export default async function (req, res) {
 
     res.status(200).json({
       code: 200,
-      user: { ...verifyToken.user },
+      user: { ...verifyToken.user, accessToken: verifyToken.accessToken },
     });
   } catch (err) {
     console.log("err: ", err);

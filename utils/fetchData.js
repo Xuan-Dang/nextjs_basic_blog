@@ -1,11 +1,45 @@
 import axios from "axios";
+import mem from "mem";
+
 const instance = axios.create({
   baseURL: "http://localhost:3000/api",
 });
+
+const refreshTokenFn = async () => {
+  const refreshToken = JSON.parse(localStorage.getItem("rf_token"));
+
+  try {
+    const response = await instance.post("/auth/refresh-token", {
+      refreshToken: refreshToken ? refreshToken : null,
+    });
+
+    const { user } = response;
+
+    if (!user.accessToken) {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("rf_token");
+      localStorage.removeItem("is_login");
+    }
+    return user;
+  } catch (error) {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("rf_token");
+    localStorage.removeItem("is_login");
+  }
+};
+
+const memoizedRefreshToken = mem(refreshTokenFn, {
+  maxAge: 10000,
+});
+
 instance.defaults.timeout = 3600;
 // Thêm một bộ đón chặn request
 instance.interceptors.request.use(
   function (config) {
+    const accessToken = JSON.parse(localStorage.getItem("access_token"));
+    if (accessToken) {
+      config.headers = { ...config.headers, Authorization: accessToken };
+    }
     // Làm gì đó trước khi request dược gửi đi
     return config;
   },
@@ -23,22 +57,44 @@ instance.interceptors.response.use(
     console.log("response: ", response);
     return response.data;
   },
-  function (error) {
+  async function (error) {
     // Bất kì mã trạng thái nào lọt ra ngoài tầm 2xx đều khiến hàm này được trigger\
     // Làm gì đó với lỗi response
-    console.log("error: ", error);
-    if (error.response && error.response.data)
-      return Promise.reject(error.response.data);
+    const config = error.config;
+    if (error?.response?.data?.message === "jwt expired" && !config?.sent) {
+      config.sent = true;
 
+      const result = await memoizedRefreshToken();
+
+      if (result?.accessToken) {
+        localStorage.setItem(
+          "access_token",
+          JSON.stringify(result?.accessToken)
+        );
+        config.headers = {
+          ...config.headers,
+          authorization: `${result?.accessToken}`,
+        };
+      }
+
+      return axios(config);
+    }
+    if (error?.response?.data?.message === "rf_token expired") {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("rf_token");
+      localStorage.removeItem("is_login");
+      return Promise.reject({
+        code: 400,
+        message: "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại",
+      });
+    }
     if (error.code === "ECONNABORTED")
       return Promise.reject({
         code: 400,
         message: "Yêu cầu hết hạn, vui lòng thử lại",
       });
-    return Promise.reject({
-      code: 400,
-      message: "Có gì đó không ổn",
-    });
+    if (error.response && error.response.data)
+      return Promise.reject(error.response.data);
   }
 );
 export async function getData(url, config) {

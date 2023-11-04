@@ -7,6 +7,9 @@ const reducers = (state, action) => {
     case ACTIONS.USER: {
       return { ...state, user: action.payload };
     }
+    case ACTIONS.IMAGE_MODAL: {
+      return { ...state, imageModal: action.payload };
+    }
     default:
       return state;
   }

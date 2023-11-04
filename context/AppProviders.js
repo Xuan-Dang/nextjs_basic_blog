@@ -8,11 +8,13 @@ export function AppProviders({ children }) {
   const initialState = {
     notify: { message: "", success: false },
     user: {},
+    imageModal: { show: false },
   };
 
   const [state, dispatch] = useReducer(reducers, initialState);
 
   useEffect(() => {
+    const controller = new AbortController();
     let refreshToken = null;
     if (localStorage.getItem("rf_token")) {
       refreshToken = JSON.parse(localStorage.getItem("rf_token"));
@@ -22,12 +24,19 @@ export function AppProviders({ children }) {
         {
           timeout: 3600,
           headers: { "content-type": "application/x-www-form-urlencoded" },
+          signal: controller.signal,
         }
       )
         .then((data) => {
-          dispatch({ type: "USER", payload: { ...data.user } });
+          const { acessToken, ...user } = data.user;
+          localStorage.setItem(
+            "access_token",
+            JSON.stringify(data.user.accessToken)
+          );
+          dispatch({ type: "USER", payload: { ...user } });
         })
         .catch((err) => {
+          localStorage.removeItem("access_token");
           localStorage.removeItem("rf_token");
           localStorage.removeItem("is_login");
           dispatch({
@@ -36,6 +45,9 @@ export function AppProviders({ children }) {
           });
         });
     }
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   return (

@@ -49,8 +49,12 @@ function Login() {
         timeout: 10000,
         headers: { "content-type": "application/x-www-form-urlencoded" },
       });
-      const { refreshToken, ...user } = res.user;
+      const { refreshToken, accessToken, ...user } = res.user;
       dispatch({ type: "USER", payload: user });
+      localStorage.setItem(
+        "access_token",
+        JSON.stringify(res.user.accessToken)
+      );
       localStorage.setItem("rf_token", JSON.stringify(res.user.refreshToken));
       localStorage.setItem("is_login", JSON.stringify(true));
       setIsLoading(false);
@@ -132,13 +136,13 @@ function Login() {
                 </Suspense>
               )}
             </Button>
-            <p className="mb-0 mt-3" style={{fontSize: "14px"}}>
+            <p className="mb-0 mt-3" style={{ fontSize: "14px" }}>
               Bạn quên mật khẩu?{" "}
               <Link href="/forgot-password" className="text-danger">
                 Lấy lại mật khẩu
               </Link>
             </p>
-            <p className="mb-0 mt-3" style={{fontSize: "14px"}}>
+            <p className="mb-0 mt-3" style={{ fontSize: "14px" }}>
               Bạn chưa có tài khoản?{" "}
               <Link href="/register" className="text-danger">
                 Đăng ký tại đây

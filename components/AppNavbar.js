@@ -22,6 +22,7 @@ function AppNavbar() {
 
   const handleLogout = () => {
     dispatch({ type: "USER", payload: {} });
+    localStorage.removeItem("access_token");
     localStorage.removeItem("rf_token");
     localStorage.removeItem("is_login");
     route.push("/login");

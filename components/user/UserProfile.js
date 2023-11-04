@@ -63,29 +63,27 @@ function UserProfile({ name }) {
     setValue("email", user.email, { shouldValidate: true });
   }, [user]);
 
+  const openImageModal = () => {
+    dispatch({ type: "IMAGE_MODAL", payload: { show: true } });
+  };
+
   return (
     <Tab.Pane eventKey={name}>
       <h2 className="fs-4 mb-3">Hồ sơ</h2>
+      <Row className="mb-3">
+        <Col>
+          <Image
+            src={user.avatar}
+            className="rounded-circle"
+            width={100}
+            height={100}
+            onClick={() => openImageModal()}
+            style={{ cursor: "pointer" }}
+            alt={`${user.fullName} avatar`}
+          />
+        </Col>
+      </Row>
       <Form>
-        <Row className="mb-3">
-          <Form.Group as={Col} controlId="avatar">
-            <Form.Label
-              className="position-relative d-block rounded-circle"
-              style={{ width: "150px", height: "150px" }}
-            >
-              <Image src={user.avatar} fill alt={`${user.avatar} avatar`} />
-            </Form.Label>
-            <Form.Control
-              type="file"
-              name="avatar"
-              onChange={(e) => setNewAvatar(e.target.files)}
-              hidden
-            />
-            <Form.Text className="text-danger">
-              {errors.avatar?.message}
-            </Form.Text>
-          </Form.Group>
-        </Row>
         <Row className="mb-3">
           <Form.Group as={Col} controlId="fullName">
             <Form.Label>Họ và tên</Form.Label>
