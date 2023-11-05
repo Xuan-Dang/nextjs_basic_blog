@@ -1,0 +1,10 @@
+.image-item-col .image-item-buttons button {
+  display: none;
+}
+.image-item-col:hover .image-item-buttons {
+  bottom: 0;
+  opacity: 0.75;
+}
+.image-item-col:hover .image-item-buttons button {
+  display: block;
+}

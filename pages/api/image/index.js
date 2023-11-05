@@ -31,7 +31,8 @@ async function getAllImage(req, res) {
       });
     }
   } catch (err) {
+    console.log(err);
     if (err.code) return res.status(err.code).json({ ...err });
-    return res.statsu(500).json({});
+    return res.status(500).json({ code: 500, message: "Lỗi máy chủ" });
   }
 }

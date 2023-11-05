@@ -5,19 +5,25 @@ import { DataContext } from "@/context/AppProviders";
 import { Container } from "react-bootstrap";
 const ToastMessage = lazy(() => import("./ToastMessage"));
 const ImageModal = lazy(() => import("./image/ImageModal"));
+const ConfirmModal = lazy(() => import("./ConfirmModal"));
 
 function Layout({ children }) {
   const { state } = useContext(DataContext);
-  const { notify, imageModal } = state;
+  const { notify, imageModal, confirmModal } = state;
   return (
     <>
+      {confirmModal?.show && (
+        <Suspense>
+          <ConfirmModal />
+        </Suspense>
+      )}
       <AppNavbar />
-      {notify.message && (
+      {notify?.message && (
         <Suspense>
           <ToastMessage />
         </Suspense>
       )}
-      {imageModal.show && (
+      {imageModal?.show && (
         <Suspense>
           <ImageModal />
         </Suspense>

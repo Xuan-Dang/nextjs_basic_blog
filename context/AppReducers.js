@@ -10,6 +10,9 @@ const reducers = (state, action) => {
     case ACTIONS.IMAGE_MODAL: {
       return { ...state, imageModal: action.payload };
     }
+    case ACTIONS.CONFIRM_MODAL: {
+      return { ...state, confirmModal: action.payload };
+    }
     default:
       return state;
   }

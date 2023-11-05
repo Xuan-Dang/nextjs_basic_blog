@@ -9,6 +9,7 @@ export function AppProviders({ children }) {
     notify: { message: "", success: false },
     user: {},
     imageModal: { show: false },
+    confirmModal: { message: "", cb: null, show: false },
   };
 
   const [state, dispatch] = useReducer(reducers, initialState);

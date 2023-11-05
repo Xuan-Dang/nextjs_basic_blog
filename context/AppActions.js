@@ -2,5 +2,6 @@ const ACTIONS = {
   NOTIFY: "NOTIFY",
   USER: "USER",
   IMAGE_MODAL: "IMAGE_MODAL",
+  CONFIRM_MODAL: "CONFIRM_MODAL",
 };
 export default ACTIONS;
