@@ -64,7 +64,10 @@ function UserProfile({ name }) {
   }, [user]);
 
   const openImageModal = () => {
-    dispatch({ type: "IMAGE_MODAL", payload: { show: true } });
+    dispatch({
+      type: "IMAGE_MODAL",
+      payload: { show: true, type: "USER_AVATAR" },
+    });
   };
 
   return (
@@ -72,15 +75,23 @@ function UserProfile({ name }) {
       <h2 className="fs-4 mb-3">Hồ sơ</h2>
       <Row className="mb-3">
         <Col>
-          <Image
-            src={user.avatar}
-            className="rounded-circle"
-            width={100}
-            height={100}
+          <div
+            className="position-relative rounded-circle"
+            style={{
+              width: "100px",
+              height: "100px",
+              cursor: "pointer",
+              overflow: "hidden",
+            }}
             onClick={() => openImageModal()}
-            style={{ cursor: "pointer" }}
-            alt={`${user.fullName} avatar`}
-          />
+          >
+            <Image
+              src={user.avatar}
+              fill
+              alt={`${user.fullName} avatar`}
+              style={{ objectFit: "cover" }}
+            />
+          </div>
         </Col>
       </Row>
       <Form>

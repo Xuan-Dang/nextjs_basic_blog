@@ -4,13 +4,16 @@ import { DataContext } from "@/context/AppProviders";
 import Image from "next/image";
 import { postData, getData, deleteData } from "../../utils/fetchData";
 const Spinner = lazy(() => import("react-bootstrap/Spinner"));
+const ImageDetail = lazy(() => import("./ImageDetail"));
 
 function ImageModal() {
   const { state, dispatch } = useContext(DataContext);
-  const { imageModal, user, confirmModal } = state;
+  const { imageModal, user, confirmModal, imageDetail } = state;
   const [images, setImages] = useState([]);
   const [num, setNum] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSelectMutiple, setSelectMultiple] = useState(false);
+  const [checkedImage, setCheckedImage] = useState([]);
 
   const hideImageModal = () => {
     dispatch({ type: "IMAGE_MODAL", payload: { show: false } });
@@ -94,6 +97,79 @@ function ImageModal() {
     }
   };
 
+  const handleCheckSingle = (id) => {
+    images.map((image) => {
+      if (image._id === id) {
+        image.checked ? (image.checked = false) : (image.checked = true);
+      } else {
+        image.checked && (image.checked = false);
+      }
+    });
+    const checkedImage = images.filter((image) => image.checked);
+    setCheckedImage([...checkedImage]);
+    setImages([...images]);
+  };
+
+  const handleCheckMultiple = (id) => {
+    images.map((image) => {
+      if (image._id === id) {
+        image.checked ? (image.checked = false) : (image.checked = true);
+      }
+    });
+    const checkedImage = images.filter((image) => image.checked);
+    setCheckedImage([...checkedImage]);
+    setImages([...images]);
+  };
+
+  const handleConfirm = () => {
+    if (imageModal.type === "USER_AVATAR") {
+      dispatch({
+        type: "USER",
+        payload: {
+          ...user,
+          avatar: checkedImage[0]?.url
+            ? checkedImage[0].url
+            : "/images/default-user-avatar.png",
+        },
+      });
+      hideImageModal();
+      return;
+    }
+  };
+
+  const handleDeleteMultiple = async () => {
+    checkedImage.length === 0 &&
+      dispatch({
+        type: "NOTIFY",
+        payload: { success: false, message: "Không có ảnh nào được chọn" },
+      });
+    const checkedImageId = checkedImage.map((image) => image._id);
+    try {
+      const res = await deleteData(
+        `/image/delete/${checkedImageId.toString()}`,
+        {
+          timeout: 10000,
+        }
+      );
+      setNum((prev) => prev + 1);
+      setCheckedImage([]);
+      setSelectMultiple(false);
+      dispatch({
+        type: "CONFIRM_MODAL",
+        payload: { message: "", cb: null, show: false },
+      });
+      dispatch({
+        type: "NOTIFY",
+        payload: { message: res.message, success: true },
+      });
+    } catch (err) {
+      return dispatch({
+        type: "NOTIFY",
+        payload: { success: false, message: err.message },
+      });
+    }
+  };
+
   return (
     <Modal
       show={imageModal.show}
@@ -108,6 +184,39 @@ function ImageModal() {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="overflow-y-scroll">
+        <Row className="mb-3 p-0">
+          <Col className="p-0">
+            <Button
+              variant="outline-danger"
+              active={isSelectMutiple}
+              onClick={() => {
+                setSelectMultiple((prev) => !prev);
+                images.map((image) => (image.checked = false));
+                setImages([...images]);
+                setCheckedImage([]);
+              }}
+              className="me-3"
+            >
+              Chọn nhiều
+            </Button>
+            <Button
+              variant="outline-warning"
+              onClick={() =>
+                dispatch({
+                  type: "CONFIRM_MODAL",
+                  payload: {
+                    message: `Bạn chắc chắn muốn xóa ${checkedImage.length} ảnh chứ`,
+                    show: true,
+                    cb: () => handleDeleteMultiple(),
+                  },
+                })
+              }
+              disabled={checkedImage.length === 0}
+            >
+              Xóa ảnh đã chọn ({checkedImage.length} ảnh)
+            </Button>
+          </Col>
+        </Row>
         <Row>
           <Col xs={6} md={4} lg={3} className="border-1 border">
             <Form>
@@ -152,8 +261,8 @@ function ImageModal() {
               >
                 <Image
                   src={image.url}
-                  alt={image.alt}
-                  title={image.title}
+                  alt={image.alt ? image.alt : `Hình ảnh ${image._id}`}
+                  title={image.title ? image.title : `Hình ảnh ${image._id}`}
                   fill
                   key={image._id}
                   style={{ objectFit: "cover" }}
@@ -163,9 +272,14 @@ function ImageModal() {
                   style={{ top: "0", left: "0", right: "0" }}
                 >
                   <Button
-                    variant="outline-light"
+                    variant={image.checked ? "success" : "outline-light"}
                     size="md"
                     title="Chọn ảnh này"
+                    onClick={() =>
+                      isSelectMutiple
+                        ? handleCheckMultiple(image._id)
+                        : handleCheckSingle(image._id)
+                    }
                   >
                     <i class="bi bi-check2-circle"></i>
                   </Button>
@@ -191,6 +305,12 @@ function ImageModal() {
                       variant="outline-light"
                       size="md"
                       title="Chi tiết ảnh"
+                      onClick={() =>
+                        dispatch({
+                          type: "IMAGE_DETAIL",
+                          payload: { show: true, image: image._id },
+                        })
+                      }
                     >
                       <i class="bi bi-eye"></i>
                     </Button>
@@ -201,8 +321,18 @@ function ImageModal() {
         </Row>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => hideImageModal()}>Đóng</Button>
+        <Button
+          onClick={() => handleConfirm()}
+          disabled={imageModal.type === "USER_AVATAR" && isSelectMutiple}
+        >
+          Xác nhận
+        </Button>
       </Modal.Footer>
+      {imageDetail?.show && (
+        <Suspense>
+          <ImageDetail />
+        </Suspense>
+      )}
     </Modal>
   );
 }

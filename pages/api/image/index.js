@@ -18,7 +18,7 @@ async function getAllImage(req, res) {
     const checkAuth = await verifyAccessToken(req.headers);
     const { user } = checkAuth;
     if (user.role === "admin") {
-      const data = await Image.find({});
+      const data = await Image.find({}).populate("user", "fullName");
       return res.status(200).json({
         code: 200,
         images: data,
