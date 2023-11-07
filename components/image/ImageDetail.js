@@ -29,7 +29,6 @@ function ImageDetail() {
       signal: controller.signal,
     })
       .then((data) => {
-        console.log("data: ", data);
         const { image } = data;
         const d = new Date(image.createdAt);
         setImage((prev) => ({

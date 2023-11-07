@@ -147,7 +147,7 @@ function UserProfile({ name }) {
           </Form.Group>
         </Row>
         <Form.Group as={Col}>
-          <Button>Cập nhật hồ sơ</Button>
+          <Button variant="dark">Cập nhật hồ sơ</Button>
         </Form.Group>
       </Form>
     </Tab.Pane>

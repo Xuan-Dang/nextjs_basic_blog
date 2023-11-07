@@ -36,10 +36,9 @@ instance.defaults.timeout = 3600;
 // Thêm một bộ đón chặn request
 instance.interceptors.request.use(
   function (config) {
-    const accessToken = JSON.parse(localStorage.getItem("access_token"));
-    if (accessToken) {
+    const accessToken = JSON.parse(localStorage?.getItem("access_token"));
+    if (accessToken)
       config.headers = { ...config.headers, Authorization: accessToken };
-    }
     // Làm gì đó trước khi request dược gửi đi
     return config;
   },
@@ -60,6 +59,7 @@ instance.interceptors.response.use(
   async function (error) {
     // Bất kì mã trạng thái nào lọt ra ngoài tầm 2xx đều khiến hàm này được trigger\
     // Làm gì đó với lỗi response
+    console.log("error: ", error);
     const config = error.config;
     if (error?.response?.data?.message === "jwt expired" && !config?.sent) {
       config.sent = true;
@@ -88,13 +88,12 @@ instance.interceptors.response.use(
         message: "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại",
       });
     }
-    if (error.code === "ECONNABORTED")
+    if (error?.code === "ECONNABORTED")
       return Promise.reject({
         code: 400,
         message: "Yêu cầu hết hạn, vui lòng thử lại",
       });
-    if (error.response && error.response.data)
-      return Promise.reject(error.response.data);
+    if (error?.response?.data) return Promise.reject(error.response.data);
   }
 );
 export async function getData(url, config) {

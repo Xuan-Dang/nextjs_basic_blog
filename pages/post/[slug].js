@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout";
-import { getData } from "../../utils/fetchData";
+import { getDataServerSide } from "../../utils/fetchDataServerSide";
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import Error from "@/components/Error";
@@ -26,7 +26,7 @@ function post({ post, error }) {
       {error && <Error code={error.code} message={error.message} />}
       {!post && <Error code={404} message="Không tìm thấy bài viết" />}
       {/* End error */}
-      
+
       {/* Post */}
       {post && (
         <Card className="border-0 shadow-sm p-3">
@@ -71,7 +71,7 @@ function post({ post, error }) {
             <Image src={post.image} fill alt={post.title} />
           </div>
           {/* End post image */}
-          
+
           {/* Post content */}
           <Card.Body className="p-0 mt-3">{post.content}</Card.Body>
           {/* End post content */}
@@ -84,7 +84,12 @@ function post({ post, error }) {
                 return (
                   <Link
                     href={`/tag/${url}.${_id}`}
-                    style={{ display: "inline-block", width: "fit-content", fontSize: "13px", fontWeight: "300" }}
+                    style={{
+                      display: "inline-block",
+                      width: "fit-content",
+                      fontSize: "13px",
+                      fontWeight: "300",
+                    }}
                     className="p-1 btn btn-secondary rounded-0 me-1"
                   >
                     {name}
@@ -93,7 +98,7 @@ function post({ post, error }) {
               })}
             </div>
           )}
-        {/* End tag */}
+          {/* End tag */}
         </Card>
       )}
       {/* End post */}
@@ -105,9 +110,9 @@ export async function getServerSideProps(req) {
   try {
     const { slug } = req.query;
     const id = slug.split(".")[1];
-    const res = await getData(`/post/${id}`, { timeout: 3600 });
+    const res = await getDataServerSide(`/post/${id}`, { timeout: 3600 });
     return {
-      props: { post: res.post },
+      props: { post: res?.post },
     };
   } catch (err) {
     return {

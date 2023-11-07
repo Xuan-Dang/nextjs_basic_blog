@@ -3,6 +3,7 @@ import { useEffect, useState, useContext, lazy, Suspense } from "react";
 import { DataContext } from "@/context/AppProviders";
 import Image from "next/image";
 import { postData, getData, deleteData } from "../../utils/fetchData";
+import Pagina from "../Pagination";
 const Spinner = lazy(() => import("react-bootstrap/Spinner"));
 const ImageDetail = lazy(() => import("./ImageDetail"));
 
@@ -14,6 +15,7 @@ function ImageModal() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSelectMutiple, setSelectMultiple] = useState(false);
   const [checkedImage, setCheckedImage] = useState([]);
+  const [sort, setSort] = useState("");
 
   const hideImageModal = () => {
     dispatch({ type: "IMAGE_MODAL", payload: { show: false } });
@@ -56,7 +58,7 @@ function ImageModal() {
 
   useEffect(() => {
     const controller = new AbortController();
-    getData("/image", {
+    getData(`/image?sort=${sort}`, {
       signal: controller.signal,
       timeout: 10000,
     })
@@ -73,7 +75,7 @@ function ImageModal() {
     return () => {
       controller.abort();
     };
-  }, [num]);
+  }, [num, sort]);
 
   const handleDeleteImage = async (id) => {
     try {
@@ -170,6 +172,10 @@ function ImageModal() {
     }
   };
 
+  const handleSelect = (e) => {
+    setSort(e.target.value);
+  };
+
   return (
     <Modal
       show={imageModal.show}
@@ -215,6 +221,17 @@ function ImageModal() {
             >
               Xóa ảnh đã chọn ({checkedImage.length} ảnh)
             </Button>
+          </Col>
+          <Col>
+            <Form.Select
+              className="ms-auto"
+              name="sort"
+              onChange={handleSelect}
+            >
+              <option value="">Sắp xếp</option>
+              <option value="desc">Ngày tải lên: Mới nhất</option>
+              <option value="asc">Ngày tải lên: Cũ nhất</option>
+            </Form.Select>
           </Col>
         </Row>
         <Row>
@@ -319,10 +336,16 @@ function ImageModal() {
               </Col>
             ))}
         </Row>
+        <Row className="mt-3 p-0">
+          <Col className="p-0">
+            <Pagina size={"sm"} />
+          </Col>
+        </Row>
       </Modal.Body>
       <Modal.Footer>
         <Button
           onClick={() => handleConfirm()}
+          variant="dark"
           disabled={imageModal.type === "USER_AVATAR" && isSelectMutiple}
         >
           Xác nhận

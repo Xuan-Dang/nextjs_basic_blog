@@ -1,6 +1,7 @@
 import Layout from "@/components/Layout";
 import Head from "next/head";
 import { getData } from "../../utils/fetchData";
+import { getDataServerSide } from "../../utils/fetchDataServerSide";
 import Error from "../../components/Error";
 import { Row, Col, Breadcrumb } from "react-bootstrap";
 import Link from "next/link";
@@ -17,7 +18,7 @@ function posts({ posts, error }) {
       {/* End Head */}
 
       {/* Error */}
-      {error && <Error code={error.code} message={error.message} />}
+      {error && <Error code={error?.code} message={error?.message} />}
       {posts && posts.length === 0 && (
         <Error code={404} message="Không tìm thấy bài viết nào" />
       )}
@@ -60,9 +61,10 @@ function posts({ posts, error }) {
 
 export async function getServerSideProps() {
   try {
-    const res = await getData("/post", { timeout: 3600 });
-    return { props: { posts: res.posts } };
+    const res = await getDataServerSide("/post", { timeout: 10000 });
+    return { props: { posts: res?.posts ? res.posts : null } };
   } catch (err) {
+    console.log(err);
     return { props: { error: err ? err : null } };
   }
 }
