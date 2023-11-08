@@ -1,10 +1,12 @@
 import { Tab, Form, Row, Col, Button } from "react-bootstrap";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, lazy, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { DataContext } from "@/context/AppProviders";
 import Image from "next/image";
+import { putData } from "@/utils/fetchData";
+const Spinner = lazy(() => import("react-bootstrap/Spinner"));
 
 const userUpdateSchema = yup.object({
   fullName: yup.string().required("Họ và tên không được để trống"),
@@ -42,6 +44,8 @@ function UserProfile({ name }) {
   const { state, dispatch } = useContext(DataContext);
   const { user } = state;
   const [newAvatar, setNewAvatar] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [num, setNum] = useState(0);
 
   const {
     register,
@@ -61,13 +65,55 @@ function UserProfile({ name }) {
   useEffect(() => {
     setValue("fullName", user.fullName, { shouldValidate: true });
     setValue("email", user.email, { shouldValidate: true });
-  }, [user]);
+  }, [user, num]);
 
   const openImageModal = () => {
     dispatch({
       type: "IMAGE_MODAL",
       payload: { show: true, type: "USER_AVATAR" },
     });
+  };
+
+  const handleChange = (e) => {
+    setTestUser({ [e.target.name]: e.target.value });
+  };
+
+  const handleUpdate = async (data) => {
+    try {
+      setIsLoading(true);
+      const res = await putData(
+        `/auth/update/${user._id}`,
+        { ...data, avatar: user.avatar },
+        {
+          timeout: 10000,
+          headers: { "content-type": "application/x-www-form-urlencoded" },
+        }
+      );
+      setIsLoading(false);
+      setNum((prev) => prev + 1);
+      dispatch({
+        type: "USER",
+        payload: { ...user, fullName: data.fullName },
+      });
+      dispatch({
+        type: "NOTIFY",
+        payload: {
+          success: true,
+          message: res.message,
+        },
+      });
+      setValue("password", "", { shouldValidate: true });
+      setValue("confirmPassword", "", { shouldValidate: true });
+    } catch (err) {
+      setIsLoading(false);
+      return dispatch({
+        type: "NOTIFY",
+        payload: {
+          success: false,
+          message: err.message,
+        },
+      });
+    }
   };
 
   return (
@@ -94,13 +140,14 @@ function UserProfile({ name }) {
           </div>
         </Col>
       </Row>
-      <Form>
+      <Form onSubmit={handleSubmit(handleUpdate)}>
         <Row className="mb-3">
           <Form.Group as={Col} controlId="fullName">
             <Form.Label>Họ và tên</Form.Label>
             <Form.Control
               type="text"
               name="fullName"
+              onChange={handleChange}
               {...register("fullName")}
             />
             <Form.Text className="text-danger">
@@ -114,6 +161,7 @@ function UserProfile({ name }) {
               type="text"
               name="email"
               readOnly
+              onChange={handleChange}
               {...register("email")}
             />
             <Form.Text className="text-danger">
@@ -127,6 +175,7 @@ function UserProfile({ name }) {
             <Form.Control
               type="password"
               name="password"
+              onChange={handleChange}
               {...register("password")}
             />
             <Form.Text className="text-danger">
@@ -139,6 +188,7 @@ function UserProfile({ name }) {
             <Form.Control
               type="password"
               name="confirmPassword"
+              onChange={handleChange}
               {...register("confirmPassword")}
             />
             <Form.Text className="text-danger">
@@ -147,7 +197,14 @@ function UserProfile({ name }) {
           </Form.Group>
         </Row>
         <Form.Group as={Col}>
-          <Button variant="dark">Cập nhật hồ sơ</Button>
+          <Button variant="dark" type="submit">
+            Cập nhật hồ sơ{" "}
+            {isLoading && (
+              <Suspense>
+                <Spinner size="sm" animation="grow" />
+              </Suspense>
+            )}
+          </Button>
         </Form.Group>
       </Form>
     </Tab.Pane>

@@ -29,6 +29,7 @@ export const mailer = async ({ email, subject, html }) => {
 
     return sendEmailResponse;
   } catch (error) {
+    console.log(error);
     throw new Error(error.message);
   }
 };
@@ -77,6 +78,7 @@ export const sendResetPasswordEmail = async ({ email, userId }) => {
 
     return resetPasswordResponse;
   } catch (err) {
+    console.log(err);
     throw new Error(err.message);
   }
 };

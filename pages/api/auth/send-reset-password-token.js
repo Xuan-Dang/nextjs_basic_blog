@@ -36,7 +36,8 @@ async function sendResetPasswordToken(req, res) {
         "Chúng tôi đã gửi một liên kết đến email của bạn. Hãy kiểm tra email và vào liên kết đó để lấy lại mật khẩu",
     });
   } catch (err) {
-    return res.statsu(500).json({
+    console.log(err);
+    return res.status(500).json({
       code: 500,
       message: "Lỗi máy chủ",
     });

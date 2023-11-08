@@ -136,7 +136,6 @@ function ImageDetail() {
             <span>Ngày tải lên: </span>
             <span>{image?.createdAt}</span>
           </p>
-          {console.log(image)}
           <p className="mb-0 p-0">
             <span>Người tải lên: </span>
             <span>{image?.user?.fullName}</span>
