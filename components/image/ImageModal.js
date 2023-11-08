@@ -16,6 +16,9 @@ function ImageModal() {
   const [isSelectMutiple, setSelectMultiple] = useState(false);
   const [checkedImage, setCheckedImage] = useState([]);
   const [sort, setSort] = useState("");
+  const [count, setCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   const hideImageModal = () => {
     dispatch({ type: "IMAGE_MODAL", payload: { show: false } });
@@ -58,13 +61,13 @@ function ImageModal() {
 
   useEffect(() => {
     const controller = new AbortController();
-    getData(`/image?sort=${sort}`, {
+    getData(`/image?sort=${sort}&page=${page}&limit=${limit}`, {
       signal: controller.signal,
       timeout: 10000,
     })
       .then((data) => {
         setImages(data.images);
-        console.log(data);
+        setCount(data.count);
       })
       .catch((err) =>
         dispatch({
@@ -75,7 +78,7 @@ function ImageModal() {
     return () => {
       controller.abort();
     };
-  }, [num, sort]);
+  }, [num, sort, page]);
 
   const handleDeleteImage = async (id) => {
     try {
@@ -338,7 +341,13 @@ function ImageModal() {
         </Row>
         <Row className="mt-3 p-0">
           <Col className="p-0">
-            <Pagina size={"sm"} />
+            <Pagina
+              size={"md"}
+              page={page}
+              count={count}
+              limit={limit}
+              setPage={setPage}
+            />
           </Col>
         </Row>
       </Modal.Body>
