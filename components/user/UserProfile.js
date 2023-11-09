@@ -5,7 +5,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { DataContext } from "@/context/AppProviders";
 import Image from "next/image";
-import { putData } from "@/utils/fetchData";
+import { putData, getData } from "@/utils/fetchData";
+import { useRouter } from "next/router";
 const Spinner = lazy(() => import("react-bootstrap/Spinner"));
 
 const userUpdateSchema = yup.object({
@@ -43,9 +44,12 @@ const userUpdateSchema = yup.object({
 function UserProfile({ name }) {
   const { state, dispatch } = useContext(DataContext);
   const { user } = state;
+  const router = useRouter();
+  const { id } = router.query;
   const [newAvatar, setNewAvatar] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [num, setNum] = useState(0);
+  const [userById, setUserById] = useState({});
 
   const {
     register,
@@ -63,14 +67,48 @@ function UserProfile({ name }) {
   });
 
   useEffect(() => {
-    setValue("fullName", user.fullName, { shouldValidate: true });
-    setValue("email", user.email, { shouldValidate: true });
-  }, [user, num]);
+    if (id) {
+      getData(`/auth/${id}`, {
+        timeout: 10000,
+      })
+        .then((data) => {
+          const newUserData = data.user;
+          setValue("fullName", newUserData.fullName, { shouldValidate: true });
+          setValue("email", newUserData.email, { shouldValidate: true });
+          setUserById((prev) => ({ ...prev, ...newUserData }));
+          if (newUserData._id === user._id)
+            dispatch({
+              type: "USER",
+              payload: {
+                ...user,
+                fullName: newUserData.fullName,
+                avatar: newUserData.avatar,
+                email: newUserData.email,
+                role: newUserData.role,
+              },
+            });
+        })
+        .catch((err) => {
+          dispatch({
+            type: "NOTIFY",
+            payload: { success: false, message: err.message },
+          });
+        });
+    }
+  }, [id, num]);
+
+  useEffect(() => {
+    if (newAvatar) setUserById({ ...userById, avatar: newAvatar });
+  }, [newAvatar]);
 
   const openImageModal = () => {
     dispatch({
       type: "IMAGE_MODAL",
-      payload: { show: true, type: "USER_AVATAR" },
+      payload: {
+        show: true,
+        type: "USER_AVATAR",
+        cb: (image) => setNewAvatar(image),
+      },
     });
   };
 
@@ -82,8 +120,8 @@ function UserProfile({ name }) {
     try {
       setIsLoading(true);
       const res = await putData(
-        `/auth/update/${user._id}`,
-        { ...data, avatar: user.avatar },
+        `/auth/update/${userById._id}`,
+        { ...data, avatar: newAvatar },
         {
           timeout: 10000,
           headers: { "content-type": "application/x-www-form-urlencoded" },
@@ -91,10 +129,6 @@ function UserProfile({ name }) {
       );
       setIsLoading(false);
       setNum((prev) => prev + 1);
-      dispatch({
-        type: "USER",
-        payload: { ...user, fullName: data.fullName },
-      });
       dispatch({
         type: "NOTIFY",
         payload: {
@@ -116,6 +150,8 @@ function UserProfile({ name }) {
     }
   };
 
+  if (!id) return null;
+
   return (
     <Tab.Pane eventKey={name}>
       <h2 className="fs-4 mb-3">Hồ sơ</h2>
@@ -132,9 +168,9 @@ function UserProfile({ name }) {
             onClick={() => openImageModal()}
           >
             <Image
-              src={user.avatar}
+              src={userById.avatar}
               fill
-              alt={`${user.fullName} avatar`}
+              alt={`${userById.fullName} avatar`}
               style={{ objectFit: "cover" }}
             />
           </div>
@@ -149,6 +185,7 @@ function UserProfile({ name }) {
               name="fullName"
               onChange={handleChange}
               {...register("fullName")}
+              readOnly={userById._id !== user._id && user.role !== "admin"}
             />
             <Form.Text className="text-danger">
               {errors.fullName?.message}
@@ -177,6 +214,7 @@ function UserProfile({ name }) {
               name="password"
               onChange={handleChange}
               {...register("password")}
+              readOnly={userById._id !== user._id && user.role !== "admin"}
             />
             <Form.Text className="text-danger">
               {errors.password?.message}
@@ -190,6 +228,7 @@ function UserProfile({ name }) {
               name="confirmPassword"
               onChange={handleChange}
               {...register("confirmPassword")}
+              readOnly={userById._id !== user._id && user.role !== "admin"}
             />
             <Form.Text className="text-danger">
               {errors.confirmPassword?.message}
@@ -197,14 +236,18 @@ function UserProfile({ name }) {
           </Form.Group>
         </Row>
         <Form.Group as={Col}>
-          <Button variant="dark" type="submit">
-            Cập nhật hồ sơ{" "}
-            {isLoading && (
-              <Suspense>
-                <Spinner size="sm" animation="grow" />
-              </Suspense>
-            )}
-          </Button>
+          {user._id !== userById._id && user.role !== "admin" ? (
+            ""
+          ) : (
+            <Button variant="dark" type="submit">
+              Cập nhật hồ sơ{" "}
+              {isLoading && (
+                <Suspense>
+                  <Spinner size="sm" animation="grow" />
+                </Suspense>
+              )}
+            </Button>
+          )}
         </Form.Group>
       </Form>
     </Tab.Pane>

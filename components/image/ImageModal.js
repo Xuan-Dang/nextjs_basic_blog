@@ -128,15 +128,7 @@ function ImageModal() {
 
   const handleConfirm = () => {
     if (imageModal.type === "USER_AVATAR") {
-      dispatch({
-        type: "USER",
-        payload: {
-          ...user,
-          avatar: checkedImage[0]?.url
-            ? checkedImage[0].url
-            : "/images/default-user-avatar.png",
-        },
-      });
+      imageModal.cb(checkedImage[0]?.url);
       hideImageModal();
       return;
     }

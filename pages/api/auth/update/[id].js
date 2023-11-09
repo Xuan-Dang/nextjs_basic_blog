@@ -17,7 +17,6 @@ export default async function (req, res) {
 
 async function updateUserById(req, res) {
   try {
-    console.log(req.body);
     const { id } = req.query;
     const { avatar, fullName, email, password, confirmPassword } = req.body;
 
@@ -53,26 +52,19 @@ async function updateUserById(req, res) {
         .statsu(403)
         .json({ code: 403, message: "Email không được thay đổi" });
 
-    if (password) {
-      const salt = bcrypt.genSaltSync(10);
-      const newPassword = bcrypt.hashSync(password, salt);
-      await User.findByIdAndUpdate(id, {
-        avatar,
-        fullName,
-        password: newPassword,
-      });
-    } else {
-      await User.findByIdAndUpdate(id, {
-        avatar: avatar,
-        fullName: fullName,
-      });
-    }
+    const salt = bcrypt.genSaltSync(10);
+
+    await User.findByIdAndUpdate(id, {
+      avatar: avatar ? avatar : userById.avatar,
+      fullName: fullName ? fullName : userById.fullName,
+      password: password ? bcrypt.hashSync(password, salt) : userById.password,
+    });
+
     return res.status(200).json({
       code: 200,
       message: "Cập nhật thông tin người dùng thành công",
     });
   } catch (err) {
-    console.log(err);
     if (err.code) return res.status(err.code).json(err);
     return res.status(500).json({
       code: 500,

@@ -8,7 +8,7 @@ export function AppProviders({ children }) {
   const initialState = {
     notify: { message: "", success: false },
     user: {},
-    imageModal: { show: false, type: "" },
+    imageModal: { show: false, type: "", cb: null },
     confirmModal: { message: "", cb: null, show: false },
     imageDetail: { show: false, image: null },
   };
