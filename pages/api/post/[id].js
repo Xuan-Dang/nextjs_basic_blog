@@ -19,6 +19,11 @@ export default async function (req, res) {
 async function getSinglePost(req, res) {
   try {
     const { id } = req.query;
+    if (!id)
+      return res.status(400).json({
+        code: 400,
+        message: "Id người dùng không hợp lệ",
+      });
     const postById = await Post.findById(id, "-__v -createdAt -updatedAt")
       .populate("author", "fullName avatar")
       .populate("category", "name url");
@@ -29,14 +34,14 @@ async function getSinglePost(req, res) {
         message: "Không tìm thấy bài viết này",
       });
 
-    const tags = await TagLookup.find({ postId: postById._id }, "-postId -_id -__v -createdAt -updatedAt").populate(
-      "tagId",
-      "name url"
-    );
+    const tags = await TagLookup.find(
+      { postId: postById._id },
+      "-postId -_id -__v -createdAt -updatedAt"
+    ).populate("tagId", "name url");
 
     return res.status(200).json({
       code: 200,
-      post: {...postById._doc, tags: [...tags]},
+      post: { ...postById._doc, tags: [...tags] },
     });
   } catch (err) {
     console.log(err);

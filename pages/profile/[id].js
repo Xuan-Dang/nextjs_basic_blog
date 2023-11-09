@@ -11,9 +11,11 @@ import {
   Container,
   Form,
   Button,
+  Breadcrumb,
 } from "react-bootstrap";
 import UserProfile from "@/components/user/UserProfile";
 import Head from "next/head";
+import Link from "next/link";
 
 function Profile() {
   const { state, dispatch } = useContext(DataContext);
@@ -32,16 +34,18 @@ function Profile() {
   return (
     <Layout>
       <Head>
-        <title>
-          {Object.keys(user).length > 0
-            ? `${user.fullName} - Profile`
-            : "Profile"}
-        </title>
+        <title>User Profile</title>
       </Head>
       <Container fluid="lg">
         <Row>
           <Col className="px-0">
-            <h1 className="fs-3">Hồ sơ cá nhân</h1>
+            <Breadcrumb>
+              <Link href="/" className="breadcrumb-item">
+                Home
+              </Link>
+              <Breadcrumb.Item active>Hồ sơ người dùng</Breadcrumb.Item>
+            </Breadcrumb>
+            <h1 className="fs-3">Hồ sơ người dùng</h1>
           </Col>
         </Row>
       </Container>
