@@ -98,6 +98,14 @@ function AppNavbar() {
                       >
                         Hồ sơ
                       </Link>
+                      {user.role === "admin" && (
+                        <Link
+                          className="dropdown-item"
+                          href={`/manager/post-category`}
+                        >
+                          Danh mục bài viết
+                        </Link>
+                      )}
                       <Dropdown.Divider />
                       <Dropdown.Item onClick={handleLogout}>
                         Đăng Xuất
