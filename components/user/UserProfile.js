@@ -67,9 +67,11 @@ function UserProfile({ name }) {
   });
 
   useEffect(() => {
+    const controller = new AbortController();
     if (id) {
       getData(`/auth/${id}`, {
         timeout: 10000,
+        signal: controller.signal,
       })
         .then((data) => {
           const newUserData = data.user;
@@ -95,6 +97,9 @@ function UserProfile({ name }) {
           });
         });
     }
+    return () => {
+      controller.abort();
+    };
   }, [id, num]);
 
   useEffect(() => {
