@@ -6,10 +6,10 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import createSlug from "../../utils/createSlug";
-import { postData } from "@/utils/fetchData";
+import { putData } from "@/utils/fetchData";
 const Spinner = lazy(() => import("react-bootstrap/Spinner"));
 
-const addNewPostCategorySchema = yup.object({
+const schema = yup.object({
   name: yup.string().required("Vui lòng nhập tên danh mục"),
   url: yup.string().test({
     name: "testPostCategoryName",
@@ -22,16 +22,9 @@ const addNewPostCategorySchema = yup.object({
   description: yup.string(),
 });
 
-function AddNewPostCategory() {
+function Update({ setNum, category, isUpdate, setIsUpdate }) {
   const { state, dispatch } = useContext(DataContext);
-  const { imageModal } = state;
-  const [error, setError] = useState("");
   const [categoryImage, setCategoryImage] = useState({ _id: "", url: "" });
-  const [category, setCategory] = useState({
-    name: "",
-    url: "",
-    description: "",
-  });
   const [isLoading, setIsLoading] = useState(false);
 
   const openImageModal = () => {
@@ -52,7 +45,7 @@ function AddNewPostCategory() {
     reset,
     setValue,
   } = useForm({
-    resolver: yupResolver(addNewPostCategorySchema),
+    resolver: yupResolver(schema),
     mode: "onBlur",
     defaultValues: {
       name: "",
@@ -66,11 +59,11 @@ function AddNewPostCategory() {
       setValue("url", createSlug(e.target.value), { shouldValidate: true });
   };
 
-  const handleCreate = async (data) => {
+  const handleUpdate = async (data, id) => {
     try {
       setIsLoading(true);
-      const res = await postData(
-        "/post-category/create",
+      const res = await putData(
+        `/post-category/update/${category._id}`,
         { ...data, image: categoryImage._id },
         {
           timeout: 5000,
@@ -81,6 +74,8 @@ function AddNewPostCategory() {
       );
       setIsLoading(false);
       reset();
+      setIsUpdate(false);
+      setNum((prev) => prev + 1);
       setCategoryImage({ _id: "", url: "" });
       dispatch({
         type: "NOTIFY",
@@ -97,10 +92,20 @@ function AddNewPostCategory() {
       });
     }
   };
+
+  useEffect(() => {
+    if (isUpdate && Object.keys(category).length > 0) {
+      Object.keys(category).forEach((key) =>
+        setValue(key, category[key], { shouldValidate: true })
+      );
+      setCategoryImage({ ...category.image });
+    }
+  }, [isUpdate, category]);
+
   return (
     <Col xs={12} md={4}>
-      <h3 className="fs-5">Thêm danh mục bài viết mới</h3>
-      <Form onSubmit={handleSubmit(handleCreate)}>
+      <h3 className="fs-5">Sửa danh mục bài viết</h3>
+      <Form onSubmit={handleSubmit(handleUpdate)}>
         <Form.Group className="mb-3" controlId="name">
           <Form.Label>Tên danh mục</Form.Label>
           <Form.Control
@@ -149,7 +154,7 @@ function AddNewPostCategory() {
           ></i>
         )}
         <Button type="submit" variant="dark" className="w-100">
-          Tạo danh mục{" "}
+          Sửa danh mục{" "}
           {isLoading && (
             <Suspense>
               <Spinner animation="grow" size="sm" />
@@ -160,4 +165,4 @@ function AddNewPostCategory() {
     </Col>
   );
 }
-export default AddNewPostCategory;
+export default Update;

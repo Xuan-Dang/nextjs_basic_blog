@@ -3,19 +3,28 @@ import { useEffect, useState, lazy, Suspense, useContext } from "react";
 import { Row, Col, Breadcrumb } from "react-bootstrap";
 import { DataContext } from "@/context/AppProviders";
 import { useRouter } from "next/router";
-import Table from "react-bootstrap/Table";
 import Head from "next/head";
 import Link from "next/link";
-import AddNewPostCategory from "@/components/post-category/AddNewPostCategory";
-import PostCategoryList from "../../../components/post-category/PostCategoryList";
+import Add from "@/components/post-category/Add";
+import List from "@/components/post-category/List";
+const Update = lazy(() => import("../../../components/post-category/Update"));
 
 function postCategory() {
   const { state, dispatch } = useContext(DataContext);
   const { user } = state;
   const router = useRouter();
+  const [num, setNum] = useState(0);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [category, setCategory] = useState({});
 
   useEffect(() => {
-    if (Object.keys(user).length > 0 && user.role !== "admin") router.push("/");
+    // if (Object.keys(user).length > 0) {
+    //   if (user?.role && user.role !== "admin") {
+    //     router.push("/");
+    //   }
+    // } else {
+    //   router.push("/");
+    // }
   }, [user]);
   return (
     <Layout>
@@ -34,8 +43,19 @@ function postCategory() {
         </Col>
       </Row>
       <Row>
-        <AddNewPostCategory />
-        <PostCategoryList />
+        {isUpdate ? (
+          <Suspense>
+            <Update isUpdate={isUpdate} category={...category} setNum={setNum} setIsUpdate={setIsUpdate}  />
+          </Suspense>
+        ) : (
+          <Add setNum={setNum} />
+        )}
+        <List
+          parentNum={num}
+          setIsUpdate={setIsUpdate}
+          setCategory={setCategory}
+          isUpdate={isUpdate}
+        />
       </Row>
     </Layout>
   );

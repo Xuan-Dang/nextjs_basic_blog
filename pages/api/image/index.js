@@ -16,16 +16,17 @@ export default async function (req, res) {
 async function getAllImage(req, res) {
   try {
     const checkAuth = await verifyAccessToken(req.headers);
-    const { sort } = req.query;
+    const sort = req.query?.sort || "desc";
     const limit = req.query?.limit || 10;
     const page = req.query?.page || 1;
+    const skip = (page - 1) * limit;
     const { user } = checkAuth;
     if (user.role === "admin") {
       const data = await Image.find({})
         .populate("user", "fullName")
-        .sort({ createdAt: `${sort ? sort : "desc"}` })
+        .sort({ createdAt: sort })
         .limit(limit)
-        .skip((page - 1) * limit);
+        .skip(skip);
       const count = await Image.find({}).count();
       return res.status(200).json({
         code: 200,
