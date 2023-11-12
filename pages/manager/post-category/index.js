@@ -54,6 +54,7 @@ function postCategory() {
           parentNum={num}
           setIsUpdate={setIsUpdate}
           setCategory={setCategory}
+          categoryToUpdate={category}
           isUpdate={isUpdate}
         />
       </Row>

@@ -24,9 +24,11 @@ async function show(req, res) {
       .sort({ createdAt: sort })
       .limit(limit)
       .skip(skip);
+    const count = await Category.find({}).count();
     return res.status(200).json({
       code: 200,
       postCategories,
+      count,
     });
   } catch (err) {
     console.log(err);

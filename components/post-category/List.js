@@ -1,13 +1,18 @@
-import { Col, Table, Button } from "react-bootstrap";
+import { Col, Table, Button, Form, Row } from "react-bootstrap";
 import { useEffect, useState, useContext, lazy, Suspense } from "react";
 import { getData, postData, deleteData } from "../../utils/fetchData";
 import { DataContext } from "@/context/AppProviders";
 import Image from "next/image";
-import Link from "next/link";
-import { number } from "yup";
+import Pagina from "../Pagination";
 const Spinner = lazy(() => import("react-bootstrap/Spinner"));
 
-function List({ parentNum, setIsUpdate, setCategory, isUpdate }) {
+function List({
+  parentNum,
+  setIsUpdate,
+  setCategory,
+  isUpdate,
+  categoryToUpdate,
+}) {
   const { state, dispatch } = useContext(DataContext);
   const { confirmModal } = state;
   const [postCategories, setPostCategories] = useState([]);
@@ -16,6 +21,7 @@ function List({ parentNum, setIsUpdate, setCategory, isUpdate }) {
   const [sort, setSort] = useState("desc");
   const [num, setNum] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -25,6 +31,7 @@ function List({ parentNum, setIsUpdate, setCategory, isUpdate }) {
     })
       .then((data) => {
         setPostCategories(data.postCategories);
+        setCount(data.count);
       })
       .catch((err) => {
         dispatch({
@@ -35,7 +42,7 @@ function List({ parentNum, setIsUpdate, setCategory, isUpdate }) {
     return () => {
       controller.abort();
     };
-  }, [page, num, parentNum]);
+  }, [page, num, parentNum, sort]);
 
   const handleDelete = async (id) => {
     try {
@@ -68,7 +75,20 @@ function List({ parentNum, setIsUpdate, setCategory, isUpdate }) {
   return (
     <Col xs={12} md={8}>
       <h3 className="fs-5">Danh sách danh mục bài viết</h3>
-      <Table striped bordered hover>
+      <Row className="my-3">
+        <Col xs={12} md={6} lg={4}>
+          <Form.Select
+            className="ms-auto"
+            name="sort"
+            onChange={(e) => setSort(e.target.value)}
+          >
+            <option value="">Sắp xếp</option>
+            <option value="desc">Ngày tạo: Mới nhất</option>
+            <option value="asc">Ngày tạo: Cũ nhất</option>
+          </Form.Select>
+        </Col>
+      </Row>
+      <Table striped bordered responsive="xl">
         <thead>
           <tr>
             <th className="align-middle text-center">#</th>
@@ -108,7 +128,7 @@ function List({ parentNum, setIsUpdate, setCategory, isUpdate }) {
                   )}
                 </td>
                 <td className="align-middle text-center">
-                  {isUpdate ? (
+                  {isUpdate && category?._id === categoryToUpdate?._id ? (
                     <Button
                       variant="warning"
                       className="me-2"
@@ -156,6 +176,15 @@ function List({ parentNum, setIsUpdate, setCategory, isUpdate }) {
           })}
         </tbody>
       </Table>
+      {count > 0 && (
+        <Pagina
+          count={count}
+          size={"md"}
+          limit={limit}
+          page={page}
+          setPage={setPage}
+        />
+      )}
     </Col>
   );
 }

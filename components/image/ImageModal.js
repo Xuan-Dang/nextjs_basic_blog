@@ -338,13 +338,15 @@ function ImageModal() {
         </Row>
         <Row className="mt-3 p-0">
           <Col className="p-0">
-            <Pagina
-              size={"md"}
-              page={page}
-              count={count}
-              limit={limit}
-              setPage={setPage}
-            />
+            {count > 0 && (
+              <Pagina
+                size={"md"}
+                page={page}
+                count={count}
+                limit={limit}
+                setPage={setPage}
+              />
+            )}
           </Col>
         </Row>
       </Modal.Body>
