@@ -5,11 +5,11 @@ import { DataContext } from "@/context/AppProviders";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
-import Add from "@/components/post-category/Add";
-import List from "@/components/post-category/List";
-const Update = lazy(() => import("../../../components/post-category/Update"));
+import Add from "@/components/tag/Add";
+import List from "@/components/tag/List";
+const Update = lazy(() => import("../../../components/tag/Update"));
 
-function postCategory() {
+function tag() {
   const { state, dispatch } = useContext(DataContext);
   const { user } = state;
   const router = useRouter();
@@ -29,7 +29,7 @@ function postCategory() {
   return (
     <Layout>
       <Head>
-        <title>Quản lý danh mục bài viết</title>
+        <title>Quản lý tag</title>
       </Head>
       <Row className="mb-3">
         <Col>
@@ -37,9 +37,9 @@ function postCategory() {
             <Link href="/" className="breadcrumb-item">
               Home
             </Link>
-            <Breadcrumb.Item active>Quản lý danh mục bài viết</Breadcrumb.Item>
+            <Breadcrumb.Item active>Quản lý tag</Breadcrumb.Item>
           </Breadcrumb>
-          <h1 className="card-title fs-3">Quản lý danh mục bài viết</h1>
+          <h1 className="card-title fs-3">Quản lý tag</h1>
         </Col>
       </Row>
       <Row>
@@ -61,4 +61,4 @@ function postCategory() {
     </Layout>
   );
 }
-export default postCategory;
+export default tag;
