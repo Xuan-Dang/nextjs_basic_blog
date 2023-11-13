@@ -15,7 +15,7 @@ function tag() {
   const router = useRouter();
   const [num, setNum] = useState(0);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [category, setCategory] = useState({});
+  const [tag, setTag] = useState({});
 
   useEffect(() => {
     if (Object.keys(user).length > 0) {
@@ -45,7 +45,7 @@ function tag() {
       <Row>
         {isUpdate ? (
           <Suspense>
-            <Update isUpdate={isUpdate} category={...category} setNum={setNum} setIsUpdate={setIsUpdate}  />
+            <Update isUpdate={isUpdate} tag={...tag} setNum={setNum} setIsUpdate={setIsUpdate}  />
           </Suspense>
         ) : (
           <Add setNum={setNum} />
@@ -53,8 +53,8 @@ function tag() {
         <List
           parentNum={num}
           setIsUpdate={setIsUpdate}
-          setCategory={setCategory}
-          categoryToUpdate={category}
+          setTag={setTag}
+          tagToUpdate={tag}
           isUpdate={isUpdate}
         />
       </Row>

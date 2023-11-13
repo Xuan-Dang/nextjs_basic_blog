@@ -52,7 +52,7 @@ function Add({ setNum }) {
     try {
       setIsLoading(true);
       const res = await postData(
-        "/post-category/create",
+        "/tag/create",
         { ...data },
         {
           timeout: 5000,
@@ -64,7 +64,6 @@ function Add({ setNum }) {
       setIsLoading(false);
       reset();
       setNum((prev) => prev + 1);
-      setCategoryImage({ _id: "", url: "" });
       dispatch({
         type: "NOTIFY",
         payload: { success: true, message: res.message },

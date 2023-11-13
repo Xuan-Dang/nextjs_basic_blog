@@ -2,35 +2,28 @@ import { Col, Table, Button, Form, Row } from "react-bootstrap";
 import { useEffect, useState, useContext, lazy, Suspense } from "react";
 import { getData, postData, deleteData } from "../../utils/fetchData";
 import { DataContext } from "@/context/AppProviders";
-import Image from "next/image";
 import Pagina from "../Pagination";
 const Spinner = lazy(() => import("react-bootstrap/Spinner"));
 
-function List({
-  parentNum,
-  setIsUpdate,
-  setCategory,
-  isUpdate,
-  categoryToUpdate,
-}) {
+function List({ parentNum, setIsUpdate, setTag, isUpdate, tagToUpdate }) {
   const { state, dispatch } = useContext(DataContext);
-  const { confirmModal } = state;
-  const [postCategories, setPostCategories] = useState([]);
+  const [tags, setTags] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("desc");
   const [num, setNum] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [count, setCount] = useState(0);
+  const [tagToDelete, setTagToDelete] = useState(null);
 
   useEffect(() => {
     const controller = new AbortController();
-    getData(`/post-category?sort=${sort}&limit=${limit}&page=${page}`, {
+    getData(`/tag?sort=${sort}&limit=${limit}&page=${page}`, {
       timeout: 3600,
       signal: controller.signal,
     })
       .then((data) => {
-        setPostCategories(data.postCategories);
+        setTags(data.tags);
         setCount(data.count);
       })
       .catch((err) => {
@@ -46,12 +39,6 @@ function List({
 
   const handleDelete = async (id) => {
     try {
-      setIsLoading(true);
-      const res = await deleteData(`/post-category/delete/${id}`, {
-        timeout: 3600,
-      });
-      setIsLoading(false);
-      setNum((prev) => prev + 1);
       dispatch({
         type: "CONFIRM_MODAL",
         payload: {
@@ -60,6 +47,12 @@ function List({
           cb: null,
         },
       });
+      setIsLoading(true);
+      const res = await deleteData(`/tag/delete/${id}`, {
+        timeout: 3600,
+      });
+      setIsLoading(false);
+      setNum((prev) => prev + 1);
       dispatch({
         type: "NOTIFY",
         payload: { success: true, message: res.message },
@@ -72,6 +65,7 @@ function List({
       });
     }
   };
+
   return (
     <Col xs={12} md={8}>
       <h3 className="fs-5">Danh sách danh mục bài viết</h3>
@@ -94,46 +88,23 @@ function List({
             <th className="align-middle text-center">#</th>
             <th className="align-middle text-center">Tên danh mục</th>
             <th className="align-middle text-center">Url</th>
-            <th className="align-middle text-center">Hình ảnh</th>
             <th className="align-middle text-center">Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {postCategories.map((category, index) => {
+          {tags.map((tag, index) => {
             return (
-              <tr key={category._id}>
+              <tr key={tag._id}>
                 <td className="align-middle text-center">{index + 1}</td>
-                <td className="align-middle">{category.name}</td>
-                <td className="align-middle">{category.url}</td>
-                <td>
-                  {category?.image?.url ? (
-                    <div
-                      className="position-relative text-center"
-                      style={{ width: "100%", height: "100px" }}
-                    >
-                      <Image
-                        src={category.image.url}
-                        alt={
-                          category?.image?.alt
-                            ? category.image.alt
-                            : `Post category image`
-                        }
-                        fill
-                        title={category.image.title}
-                        style={{ objectFit: "cover" }}
-                      />
-                    </div>
-                  ) : (
-                    "Không có hình ảnh"
-                  )}
-                </td>
+                <td className="align-middle">{tag.name}</td>
+                <td className="align-middle">{tag.url}</td>
                 <td className="align-middle text-center">
-                  {isUpdate && category?._id === categoryToUpdate?._id ? (
+                  {isUpdate && tag?._id === tagToUpdate?._id ? (
                     <Button
                       variant="warning"
                       className="me-2"
                       onClick={() => {
-                        setIsUpdate(false), setCategory({});
+                        setIsUpdate(false), setTag({});
                       }}
                     >
                       Hủy
@@ -143,7 +114,7 @@ function List({
                       variant="success"
                       className="me-2"
                       onClick={() => {
-                        setIsUpdate(true), setCategory({ ...category });
+                        setIsUpdate(true), setTag({ ...tag });
                       }}
                     >
                       Sửa
@@ -151,20 +122,20 @@ function List({
                   )}
                   <Button
                     variant="danger"
-                    onClick={() =>
+                    onClick={() => {
+                      setTagToDelete(tag._id);
                       dispatch({
                         type: "CONFIRM_MODAL",
                         payload: {
                           show: true,
-                          message:
-                            "Bạn thực sự muốn xóa danh mục bài viết này chứ?",
-                          cb: () => handleDelete(category._id),
+                          message: "Bạn thực sự muốn xóa tag này chứ?",
+                          cb: () => handleDelete(tag._id),
                         },
-                      })
-                    }
+                      });
+                    }}
                   >
                     Xóa
-                    {isLoading && (
+                    {isLoading && tagToDelete === tag._id && (
                       <Suspense>
                         <Spinner size="sm" animation="grow" />
                       </Suspense>

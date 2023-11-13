@@ -22,21 +22,9 @@ const schema = yup.object({
   description: yup.string(),
 });
 
-function Update({ setNum, category, isUpdate, setIsUpdate }) {
+function Update({ setNum, tag, isUpdate, setIsUpdate }) {
   const { state, dispatch } = useContext(DataContext);
-  const [categoryImage, setCategoryImage] = useState({ _id: "", url: "" });
   const [isLoading, setIsLoading] = useState(false);
-
-  const openImageModal = () => {
-    dispatch({
-      type: "IMAGE_MODAL",
-      payload: {
-        show: true,
-        cb: (image) => setCategoryImage(() => ({ ...image })),
-        type: "CATEGORY_IMAGE",
-      },
-    });
-  };
 
   const {
     register,
@@ -63,8 +51,8 @@ function Update({ setNum, category, isUpdate, setIsUpdate }) {
     try {
       setIsLoading(true);
       const res = await putData(
-        `/post-category/update/${category._id}`,
-        { ...data, image: categoryImage._id },
+        `/tag/update/${tag._id}`,
+        { ...data },
         {
           timeout: 5000,
           headers: {
@@ -76,7 +64,6 @@ function Update({ setNum, category, isUpdate, setIsUpdate }) {
       reset();
       setIsUpdate(false);
       setNum((prev) => prev + 1);
-      setCategoryImage({ _id: "", url: "" });
       dispatch({
         type: "NOTIFY",
         payload: { success: true, message: res.message },
@@ -94,13 +81,12 @@ function Update({ setNum, category, isUpdate, setIsUpdate }) {
   };
 
   useEffect(() => {
-    if (isUpdate && Object.keys(category).length > 0) {
-      Object.keys(category).forEach((key) =>
-        setValue(key, category[key], { shouldValidate: true })
+    if (isUpdate && Object.keys(tag).length > 0) {
+      Object.keys(tag).forEach((key) =>
+        setValue(key, tag[key], { shouldValidate: true })
       );
-      setCategoryImage({ ...category.image });
     }
-  }, [isUpdate, category]);
+  }, [isUpdate, tag]);
 
   return (
     <Col xs={12} md={4}>
@@ -133,28 +119,8 @@ function Update({ setNum, category, isUpdate, setIsUpdate }) {
             {errors.description?.message}
           </Form.Text>
         </Form.Group>
-        {categoryImage?.url ? (
-          <div
-            className="position-relative mb-3"
-            style={{ width: "150px", height: "150px" }}
-            onClick={openImageModal}
-          >
-            <Image
-              src={categoryImage.url}
-              alt={categoryImage?.alt ? categoryImage.alt : "Category image"}
-              fill
-              style={{ objectFit: "cover" }}
-            />
-          </div>
-        ) : (
-          <i
-            className="bi bi-card-image"
-            style={{ fontSize: "100px", cursor: "pointer" }}
-            onClick={openImageModal}
-          ></i>
-        )}
         <Button type="submit" variant="dark" className="w-100">
-          Sửa danh mục{" "}
+          Sửa tag{" "}
           {isLoading && (
             <Suspense>
               <Spinner animation="grow" size="sm" />

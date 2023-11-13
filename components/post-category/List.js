@@ -22,6 +22,7 @@ function List({
   const [num, setNum] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [count, setCount] = useState(0);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -46,12 +47,6 @@ function List({
 
   const handleDelete = async (id) => {
     try {
-      setIsLoading(true);
-      const res = await deleteData(`/post-category/delete/${id}`, {
-        timeout: 3600,
-      });
-      setIsLoading(false);
-      setNum((prev) => prev + 1);
       dispatch({
         type: "CONFIRM_MODAL",
         payload: {
@@ -60,6 +55,12 @@ function List({
           cb: null,
         },
       });
+      setIsLoading(true);
+      const res = await deleteData(`/post-category/delete/${id}`, {
+        timeout: 3600,
+      });
+      setIsLoading(false);
+      setNum((prev) => prev + 1);
       dispatch({
         type: "NOTIFY",
         payload: { success: true, message: res.message },
@@ -151,7 +152,8 @@ function List({
                   )}
                   <Button
                     variant="danger"
-                    onClick={() =>
+                    onClick={() => {
+                      setCategoryToDelete(category._id);
                       dispatch({
                         type: "CONFIRM_MODAL",
                         payload: {
@@ -160,11 +162,11 @@ function List({
                             "Bạn thực sự muốn xóa danh mục bài viết này chứ?",
                           cb: () => handleDelete(category._id),
                         },
-                      })
-                    }
+                      });
+                    }}
                   >
                     Xóa
-                    {isLoading && (
+                    {isLoading && categoryToDelete === category._id && (
                       <Suspense>
                         <Spinner size="sm" animation="grow" />
                       </Suspense>
