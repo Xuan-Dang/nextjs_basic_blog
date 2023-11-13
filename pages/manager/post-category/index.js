@@ -37,7 +37,8 @@ function postCategory() {
             <Link href="/" className="breadcrumb-item">
               Home
             </Link>
-            <Breadcrumb.Item active>Quản lý danh mục bài viết</Breadcrumb.Item>
+            <Breadcrumb.Item active>Manager</Breadcrumb.Item>
+            <Breadcrumb.Item active>Danh mục bài viết</Breadcrumb.Item>
           </Breadcrumb>
           <h1 className="card-title fs-3">Quản lý danh mục bài viết</h1>
         </Col>

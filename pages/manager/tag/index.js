@@ -37,6 +37,7 @@ function tag() {
             <Link href="/" className="breadcrumb-item">
               Home
             </Link>
+            <Breadcrumb.Item active>Manager</Breadcrumb.Item>
             <Breadcrumb.Item active>Quản lý tag</Breadcrumb.Item>
           </Breadcrumb>
           <h1 className="card-title fs-3">Quản lý tag</h1>

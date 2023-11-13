@@ -109,6 +109,12 @@ function AppNavbar() {
                           <Link className="dropdown-item" href={`/manager/tag`}>
                             Tag
                           </Link>
+                          <Link
+                            className="dropdown-item"
+                            href={`/manager/post`}
+                          >
+                            Bài viết
+                          </Link>
                         </>
                       )}
                       <Dropdown.Divider />
