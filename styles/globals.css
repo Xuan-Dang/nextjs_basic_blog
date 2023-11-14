@@ -1,5 +1,6 @@
 @import url("./reset.css");
 @import url("bootstrap/dist/css/bootstrap.min.css");
 @import url("bootstrap-icons/font/bootstrap-icons.min.css");
+@import url("./main.module.css");
 @import url("./Home.module.css");
 @import url("./ImageLib.module.css");
