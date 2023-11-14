@@ -56,7 +56,7 @@ function Add({ setNum }) {
     },
   });
 
-  const handleBlur = (e) => {
+  const handleChange = (e) => {
     if (e.target.name === "name")
       setValue("url", createSlug(e.target.value), { shouldValidate: true });
   };
@@ -98,15 +98,15 @@ function Add({ setNum }) {
     <Col xs={12} md={4}>
       <h3 className="fs-5">Thêm danh mục bài viết mới</h3>
       <Form onSubmit={handleSubmit(handleCreate)}>
-        <Form.Group className="mb-3" controlId="title">
+        <Form.Group className="mb-3" controlId="name">
           <Form.Label>Tên danh mục</Form.Label>
           <Form.Control
             type="text"
-            name="title"
-            {...register("title")}
-            onBlur={handleBlur}
+            name="name"
+            {...register("name")}
+            onChange={handleChange}
           />
-          <Form.Text className="text-danger">{errors.title?.message}</Form.Text>
+          <Form.Text className="text-danger">{errors.name?.message}</Form.Text>
         </Form.Group>
         <Form.Group className="mb-3" controlId="url">
           <Form.Label>Url</Form.Label>

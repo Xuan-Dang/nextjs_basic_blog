@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import Head from "next/head";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, lazy, Suspense } from "react";
 import { Row, Col, Form, Breadcrumb, Button } from "react-bootstrap";
 import { getData, postData } from "@/utils/fetchData";
 import { DataContext } from "@/context/AppProviders";
@@ -20,8 +20,10 @@ const Editor = dynamic(
   { ssr: false }
 );
 
+const Spinner = lazy(() => import("react-bootstrap/Spinner"))
+
 const schema = yup.object({
-  title: yup.string().required("Vui lòng nhập tên danh mục"),
+  title: yup.string().required("Vui lòng nhập tiêu đề"),
   url: yup.string().test({
     title: "testPostCategoryUrl",
     test: (value, ctx) => {
@@ -38,10 +40,11 @@ function create() {
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState({});
   const [selectedTag, setSelectedTag] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [isActive, setIsActive] = useState(false);
+  const [isPublish, setIsPublish] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -59,7 +62,7 @@ function create() {
     },
   });
 
-  const handleBlur = (e) => {
+  const handleChange = (e) => {
     if (e.target.name === "title")
       setValue("url", createSlug(e.target.value), { shouldValidate: true });
   };
@@ -70,16 +73,60 @@ function create() {
   };
 
   const handleSelectCategory = (e) => {
-    console.log(e.target.value);
+    setSelectedCategory(e.target.value);
+  };
+
+  const handleSelectIsPublish = (e) => {
+    setIsPublish(e.target.value);
+  };
+
+  const handleSelectImage = (image) => {
+    setImage({ ...image });
+  };
+
+  const handleOpenImageModal = () => {
+    dispatch({
+      type: "IMAGE_MODAL",
+      payload: {
+        show: true,
+        cb: handleSelectImage,
+        type: "POST_IMAGE",
+      },
+    });
   };
 
   const handleCreate = async (data) => {
     try {
-      console.log(data);
+      setIsLoading(true)
+      const res = await postData(
+        `/post/create`,
+        {
+          ...data,
+          category: selectedCategory,
+          tags: selectedTag.toString(),
+          image: image._id,
+          isPublish,
+          content
+        },
+        {
+          timeout: 10000,
+          headers: {
+            "content-type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      setSelectedTag([])
+      setImage({})
+      setSelectedCategory(null)
+      setContent("")
+      reset()
+      setIsLoading(false)
+      dispatch({type: "NOTIFY", payload: {success: true, message: res.message}})
     } catch (err) {
+      setIsLoading(false)
       return dispatch({
         type: "NOTIFY",
-        payload: { success: false, message: err.messag },
+        payload: { success: false, message: err.message },
       });
     }
   };
@@ -149,17 +196,17 @@ function create() {
                 type="text"
                 name="title"
                 {...register("title")}
-                onBlur={handleBlur}
+                onChange={handleChange}
               />
               <Form.Text className="text-danger">
-                {/* {errors.name?.message} */}
+                {errors.title?.message}
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3" controlId="url">
               <Form.Label>Url</Form.Label>
               <Form.Control type="text" name="url" {...register("url")} />
               <Form.Text className="text-danger">
-                {/* {errors.name?.message} */}
+                {errors.url?.message}
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3" controlId="description">
@@ -170,17 +217,10 @@ function create() {
                 name="description"
                 {...register("description")}
               />
-              <Form.Text className="text-danger">
-                {/* {errors.name?.message} */}
-              </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3" controlId="content">
               <Form.Label>Nội dung</Form.Label>
               <Editor content={content} setContent={setContent} />
-              {/* <Form.Control as="textarea" name="content" rows={12} /> */}
-              <Form.Text className="text-danger">
-                {/* {errors.name?.message} */}
-              </Form.Text>
             </Form.Group>
           </Col>
           <Col xs={12} md={6} lg={4}>
@@ -190,7 +230,7 @@ function create() {
                 <div
                   className="position-relative mb-3"
                   style={{ width: "150px", height: "150px" }}
-                  // onClick={openImageModal}
+                  onClick={handleOpenImageModal}
                 >
                   <Image
                     src={image.url}
@@ -204,24 +244,26 @@ function create() {
                   <i
                     className="bi bi-card-image"
                     style={{ fontSize: "100px", cursor: "pointer" }}
-                    // onClick={openImageModal}
+                    onClick={handleOpenImageModal}
                   ></i>
                 </div>
               )}
               <Button type="submit" variant="dark" className="my-3">
                 Tạo bài viết
+                {isLoading && (
+                  <Suspense>
+                    <Spinner animation="grow" size="sm" className="ms-2" />
+                  </Suspense>
+                )}
               </Button>
             </Form.Group>
             <Form.Group className="mb-3" controlId="description">
               <Form.Label>Trạng thái</Form.Label>
-              <Form.Select aria-label="Default select example">
+              <Form.Select name="isPublish" onChange={handleSelectIsPublish}>
                 <option value="">Chọn trạng thái</option>
                 <option value={false}>Ẩn</option>
                 <option value={true}>Hiển thị</option>
               </Form.Select>
-              <Form.Text className="text-danger">
-                {/* {errors.name?.message} */}
-              </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3" controlId="category">
               <Form.Label>Chọn danh mục</Form.Label>
@@ -235,16 +277,10 @@ function create() {
                   );
                 })}
               </Form.Select>
-              <Form.Text className="text-danger">
-                {/* {errors.name?.message} */}
-              </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3" controlId="description">
               <Form.Label>Chọn tag</Form.Label>
               <Select options={tags} isMulti onChange={handleSelectTag} />
-              <Form.Text className="text-danger">
-                {/* {errors.name?.message} */}
-              </Form.Text>
             </Form.Group>
           </Col>
         </Row>

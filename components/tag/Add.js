@@ -9,7 +9,7 @@ import { postData } from "@/utils/fetchData";
 const Spinner = lazy(() => import("react-bootstrap/Spinner"));
 
 const schema = yup.object({
-  name: yup.string().required("Vui lòng nhập tên danh mục"),
+  name: yup.string().required("Vui lòng nhập tên tag"),
   url: yup.string().test({
     name: "testPostCategoryName",
     test: (value, ctx) => {
@@ -43,7 +43,7 @@ function Add({ setNum }) {
     },
   });
 
-  const handleBlur = (e) => {
+  const handleChange = (e) => {
     if (e.target.name === "name")
       setValue("url", createSlug(e.target.value), { shouldValidate: true });
   };
@@ -90,7 +90,7 @@ function Add({ setNum }) {
             type="text"
             name="name"
             {...register("name")}
-            onBlur={handleBlur}
+            onChange={handleChange}
           />
           <Form.Text className="text-danger">{errors.name?.message}</Form.Text>
         </Form.Group>

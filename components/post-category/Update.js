@@ -54,7 +54,7 @@ function Update({ setNum, category, isUpdate, setIsUpdate }) {
     },
   });
 
-  const handleBlur = (e) => {
+  const handleChange = (e) => {
     if (e.target.name === "name")
       setValue("url", createSlug(e.target.value), { shouldValidate: true });
   };
@@ -112,7 +112,7 @@ function Update({ setNum, category, isUpdate, setIsUpdate }) {
             type="text"
             name="name"
             {...register("name")}
-            onBlur={handleBlur}
+            onChange={handleChange}
           />
           <Form.Text className="text-danger">{errors.name?.message}</Form.Text>
         </Form.Group>

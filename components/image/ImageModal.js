@@ -137,6 +137,11 @@ function ImageModal() {
       hideImageModal();
       return;
     }
+    if (imageModal.type === "POST_IMAGE") {
+      imageModal.cb(checkedImage[0]);
+      hideImageModal();
+      return;
+    }
   };
 
   const handleDeleteMultiple = async () => {

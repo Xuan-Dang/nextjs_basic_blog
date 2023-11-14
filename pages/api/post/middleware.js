@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 const schema = yup.object({
-  name: yup.string().required("Tên danh mục không được bỏ trống"),
+  title: yup.string().required("Tiêu đề bài viết không được để trống"),
   url: yup.string().test({
     name: "TestUrl",
     test: (value, ctx) => {
@@ -11,7 +11,6 @@ const schema = yup.object({
     },
   }),
   description: yup.string(),
-  image: yup.string(),
 });
 
 export async function handleValidate(data) {

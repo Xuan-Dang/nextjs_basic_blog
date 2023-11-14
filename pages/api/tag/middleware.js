@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
-const tagSchema = yup.object({
-  name: yup.string().required("Tên danh mục không được bỏ trống"),
+const schema = yup.object({
+  name: yup.string().required("Tên tag không được bỏ trống"),
   url: yup.string().test({
     name: "TestUrl",
     test: (value, ctx) => {
@@ -11,12 +11,11 @@ const tagSchema = yup.object({
     },
   }),
   description: yup.string(),
-  image: yup.string(),
 });
 
-export async function tagValidate(data) {
+export async function handleValidate(data) {
   try {
-    await tagSchema.validate(data);
+    await schema.validate(data);
     return null;
   } catch (err) {
     return {
