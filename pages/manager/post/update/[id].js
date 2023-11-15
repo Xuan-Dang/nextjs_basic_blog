@@ -2,7 +2,7 @@ import Layout from "@/components/Layout";
 import Head from "next/head";
 import { useEffect, useState, useContext, lazy, Suspense } from "react";
 import { Row, Col, Form, Breadcrumb, Button } from "react-bootstrap";
-import { getData, postData } from "@/utils/fetchData";
+import { getData, putData } from "@/utils/fetchData";
 import { DataContext } from "@/context/AppProviders";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -12,15 +12,16 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import createSlug from "@/utils/createSlug";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 const Editor = dynamic(
   () => {
-    return import("../../../components/Editor");
+    return import("../../../../components/Editor");
   },
   { ssr: false }
 );
 
-const Spinner = lazy(() => import("react-bootstrap/Spinner"))
+const Spinner = lazy(() => import("react-bootstrap/Spinner"));
 
 const schema = yup.object({
   title: yup.string().required("Vui lòng nhập tiêu đề"),
@@ -35,7 +36,7 @@ const schema = yup.object({
   description: yup.string(),
 });
 
-function create() {
+function update() {
   const { state, dispatch } = useContext(DataContext);
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
@@ -45,6 +46,10 @@ function create() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isPublish, setIsPublish] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [post, setPost] = useState({});
+  const [num, setNum] = useState(0);
+  const router = useRouter();
+  const { id } = router.query;
 
   const {
     register,
@@ -94,18 +99,18 @@ function create() {
     });
   };
 
-  const handleCreate = async (data) => {
+  const handleUpdate = async (data) => {
     try {
-      setIsLoading(true)
-      const res = await postData(
-        `/post/manager/create`,
+      setIsLoading(true);
+      const res = await putData(
+        `/post/manager/update/${post._id}`,
         {
           ...data,
           category: selectedCategory,
           tags: JSON.stringify([...selectedTag]),
           image: image._id,
           isPublish,
-          content
+          content,
         },
         {
           timeout: 10000,
@@ -114,15 +119,15 @@ function create() {
           },
         }
       );
-      setSelectedTag([])
-      setImage({})
-      setSelectedCategory(null)
-      setContent("")
-      reset()
-      setIsLoading(false)
-      dispatch({type: "NOTIFY", payload: {success: true, message: res.message}})
+      setIsLoading(false);
+      setNum((prev) => prev + 1);
+      dispatch({
+        type: "NOTIFY",
+        payload: { success: true, message: res.message },
+      });
     } catch (err) {
-      setIsLoading(false)
+      console.log(err);
+      setIsLoading(false);
       return dispatch({
         type: "NOTIFY",
         payload: { success: false, message: err.message },
@@ -137,10 +142,12 @@ function create() {
       signal: controller.signal,
     })
       .then((data) => {
-        const tags = data.tags.map((tag) => {
-          return { value: tag._id, label: tag.name };
-        });
-        setTags([...tags]);
+        const tags =
+          data?.tags &&
+          data.tags.map((tag) => {
+            return { value: tag._id, label: tag.name };
+          });
+        tags && setTags([...tags]);
       })
       .catch((err) =>
         dispatch({
@@ -148,12 +155,13 @@ function create() {
           payload: { success: false, message: err.message },
         })
       );
+
     getData(`/post-category?limit=0&page=1`, {
       timeout: 10000,
       signal: controller.signal,
     })
       .then((data) => {
-        setCategories([...data.postCategories]);
+        data?.postCategories && setCategories([...data.postCategories]);
       })
       .catch((err) => {
         dispatch({
@@ -161,15 +169,48 @@ function create() {
           payload: { success: false, message: err.message },
         });
       });
+
+    if (id) {
+      getData(`/post/manager/${id}`, {
+        timeout: 10000,
+        signal: controller.signal,
+      })
+        .then((data) => {
+          const { post } = data;
+          const selectedTag =
+            post?.tags &&
+            post.tags.map((item) => ({
+              value: item.tagId._id,
+              label: item.tagId.name,
+            }));
+          selectedTag && setSelectedTag([...selectedTag]);
+          setSelectedCategory(post.category);
+          setPost({ ...post });
+          post?.title && setValue("title", post.title);
+          post?.url && setValue("url", post.url);
+          post?.description && setValue("description", post.description);
+          post?.content && setContent(post.content);
+          post?.image && setImage({ ...post.image });
+        })
+        .catch((err) => {
+          return dispatch({
+            type: "NOTIFY",
+            payload: {
+              success: false,
+              message: err.message,
+            },
+          });
+        });
+    }
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [id, num]);
 
   return (
     <Layout>
       <Head>
-        <title>Tạo bài viết</title>
+        <title>Cập nhật bài viết</title>
       </Head>
       <Row className="mb-3">
         <Col>
@@ -181,12 +222,12 @@ function create() {
             <Link href="/manager/post" className="breadcrumb-item">
               Bài viết
             </Link>
-            <Breadcrumb.Item active>Tạo mới</Breadcrumb.Item>
+            <Breadcrumb.Item active>Cập nhật</Breadcrumb.Item>
           </Breadcrumb>
-          <h1 className="card-title fs-3">Tạo bài viết mới</h1>
+          <h1 className="card-title fs-3">Cập nhật bài viết</h1>
         </Col>
       </Row>
-      <Form onSubmit={handleSubmit(handleCreate)}>
+      <Form onSubmit={handleSubmit(handleUpdate)}>
         <Row>
           <Col xs={12} md={6} lg={8}>
             <Form.Group className="mb-3" controlId="title">
@@ -248,7 +289,7 @@ function create() {
                 </div>
               )}
               <Button type="submit" variant="dark" className="my-3">
-                Tạo bài viết
+                Cập nhật bài viết
                 {isLoading && (
                   <Suspense>
                     <Spinner animation="grow" size="sm" className="ms-2" />
@@ -260,8 +301,12 @@ function create() {
               <Form.Label>Trạng thái</Form.Label>
               <Form.Select name="isPublish" onChange={handleSelectIsPublish}>
                 <option value="">Chọn trạng thái</option>
-                <option value={false}>Ẩn</option>
-                <option value={true}>Hiển thị</option>
+                <option value={false} selected={post?.isPublish ? true : false}>
+                  Ẩn
+                </option>
+                <option value={true} selected={post?.isPublish ? true : false}>
+                  Hiển thị
+                </option>
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3" controlId="category">
@@ -270,7 +315,11 @@ function create() {
                 <option value="">Chọn một danh mục</option>
                 {categories.map((category) => {
                   return (
-                    <option value={category._id} key={category._id}>
+                    <option
+                      value={category._id}
+                      key={category._id}
+                      selected={category._id === selectedCategory?._id}
+                    >
                       {category.name}
                     </option>
                   );
@@ -279,7 +328,13 @@ function create() {
             </Form.Group>
             <Form.Group className="mb-3" controlId="description">
               <Form.Label>Chọn tag</Form.Label>
-              <Select options={tags} value={selectedTag} isMulti onChange={handleSelectTag} />
+              {console.log(selectedTag)}
+              <Select
+                options={tags}
+                value={selectedTag}
+                isMulti
+                onChange={handleSelectTag}
+              />
             </Form.Group>
           </Col>
         </Row>
@@ -287,4 +342,4 @@ function create() {
     </Layout>
   );
 }
-export default create;
+export default update;

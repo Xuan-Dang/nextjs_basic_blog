@@ -53,13 +53,11 @@ instance.interceptors.response.use(
   function (response) {
     // Bất kì mã trạng thái nào nằm trong tầm 2xx đều khiến hàm này được trigger
     // Làm gì đó với dữ liệu response
-    console.log("response: ", response);
     return response.data;
   },
   async function (error) {
     // Bất kì mã trạng thái nào lọt ra ngoài tầm 2xx đều khiến hàm này được trigger\
     // Làm gì đó với lỗi response
-    console.log("error: ", error);
     const config = error.config;
     if (error?.response?.data?.message === "jwt expired" && !config?.sent) {
       config.sent = true;
@@ -107,4 +105,7 @@ export async function deleteData(url, config) {
 }
 export async function putData(url, data, config) {
   return await instance.put(url, data, config);
+}
+export async function patchData(url, data, config) {
+  return await instance.patch(url, data, config);
 }

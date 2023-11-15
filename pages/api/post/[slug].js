@@ -18,16 +18,20 @@ export default async function (req, res) {
 
 async function getSinglePost(req, res) {
   try {
-    const { id } = req.query;
+    const { slug } = req.query;
+    const id = slug.split(".")[1];
     if (!id)
       return res.status(400).json({
         code: 400,
-        message: "Id người dùng không hợp lệ",
+        message: "Id bài viết không hợp lệ",
       });
-    const postById = await Post.findById(id, "-__v -createdAt -updatedAt")
+    const postById = await Post.findOne(
+      { _id: id, isPublish: true },
+      "-__v -updatedAt"
+    )
       .populate("author", "fullName avatar")
-      .populate("category", "name url");
-
+      .populate("category", "name url")
+      .populate("image", "url alt title");
     if (!postById)
       return res.status(404).json({
         code: 404,

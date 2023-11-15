@@ -12,10 +12,10 @@ function post({ post, error }) {
 
   useEffect(() => {
     if (post) {
-      const publishedAt = new Date(post.publishedAt);
+      const publishedAt = new Date(post.createdAt);
       setPublishedAt(() => publishedAt.toLocaleDateString());
     }
-  }, []);
+  }, [post]);
 
   return (
     <Layout>
@@ -59,21 +59,37 @@ function post({ post, error }) {
             className="text-secondary"
             style={{ fontWeight: "400", fontSize: "12px" }}
           >
-            {post.author.fullName} - {publishedAt}
+            {post?.author?.fullName} - {publishedAt}
           </Card.Subtitle>
           {/* End subtitle */}
 
           {/* Post image */}
           <div
-            className="position-relative mt-3 mx-auto"
-            style={{ width: "50vw", height: "375px" }}
+            className="mt-3 mx-auto position-relative"
+            style={{
+              maxWidth: "600px",
+              width: "75vw",
+              minWidth: "250px",
+              maxHeight: "350px",
+              height: "45vw",
+              minHeight: "100px",
+              aspectRatio: "3/4"
+            }}
           >
-            <Image src={post.image} fill alt={post.title} />
+            <Image
+              src={post?.image?.url}
+              alt={post?.title}
+              fill
+              className="img-fluid img-thumbnail"
+            />
           </div>
           {/* End post image */}
 
           {/* Post content */}
-          <Card.Body className="p-0 mt-3">{post.content}</Card.Body>
+          <Card.Body
+            className="p-0 mt-3"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          ></Card.Body>
           {/* End post content */}
 
           {/* Tags */}
@@ -109,8 +125,7 @@ function post({ post, error }) {
 export async function getServerSideProps(req) {
   try {
     const { slug } = req.query;
-    const id = slug.split(".")[1];
-    const res = await getDataServerSide(`/post/${id}`, { timeout: 3600 });
+    const res = await getDataServerSide(`/post/${slug}`, { timeout: 3600 });
     return {
       props: { post: res?.post },
     };

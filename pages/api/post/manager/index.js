@@ -37,9 +37,11 @@ async function get(req, res) {
       .limit(limit)
       .skip(skip)
       .sort({ createdAt: sort });
+    const count = await Post.find({}).count();
     return res.status(200).json({
       code: 200,
       posts,
+      count,
     });
   } catch (err) {
     if (err.code) return res.status(err.code).json({ ...err });

@@ -4,7 +4,7 @@ import Image from "next/image";
 
 function PostItem({ post }) {
   return (
-    <Col xs={12} md={6} lg={4}>
+    <Col xs={12} md={6} lg={4} className="py-2">
       <Card className="border-0 shadow-sm">
         <Link
           href={`/post/${post.url}.${post._id}`}
@@ -18,7 +18,7 @@ function PostItem({ post }) {
               objectFit: "cover",
               height: "100%",
             }}
-            src={post.image}
+            src={post?.image?.url}
             className="card-img-top"
             alt={post.title}
           />

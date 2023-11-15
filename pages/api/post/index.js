@@ -2,6 +2,7 @@ import db from "../configs/connectDB";
 import Post from "../models/postModel";
 import Category from "../models/categoryModel";
 import Image from "../models/imageModel";
+import User from "../models/userModel";
 
 db();
 
@@ -27,6 +28,7 @@ async function get(req, res) {
     )
       .populate({ path: "category", select: "name url" })
       .populate({ path: "image", select: "url alt title" })
+      .populate({ path: "author", select: "fullName avatar" })
       .limit(limit)
       .skip(skip)
       .sort(sort);

@@ -1,24 +1,43 @@
 import Layout from "@/components/Layout";
 import Head from "next/head";
-import { Row, Col, Table, Breadcrumb } from "react-bootstrap";
+import {
+  Row,
+  Col,
+  Table,
+  Breadcrumb,
+  Badge,
+  Form,
+  Button,
+} from "react-bootstrap";
 import Link from "next/link";
 import { useEffect, useState, useContext, lazy, Suspense } from "react";
-import { getData } from "../../../utils/fetchData";
+import { getData, patchData, deleteData } from "../../../utils/fetchData";
 import { DataContext } from "@/context/AppProviders";
 import Image from "next/image";
+import Pagina from "@/components/Pagination";
+const Spinner = lazy(() => import("react-bootstrap/Spinner"));
 
 function post() {
   const { state, dispatch } = useContext(DataContext);
   const [posts, setPosts] = useState([]);
+  const [num, setNum] = useState(0);
+  const [updateId, setUpdateId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState("desc");
+  const [limit, setLimit] = useState(10);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
-    getData(`/post/manager?`, {
+    getData(`/post/manager?page=${page}&limit=${limit}&sort=${sort}`, {
       timeout: 10000,
       signal: controller.signal,
     })
       .then((data) => {
         setPosts(data.posts);
+        setCount(data.count);
       })
       .catch((err) => {
         dispatch({
@@ -29,7 +48,78 @@ function post() {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [num, sort, page]);
+
+  const handleUpdateIsPublish = async (id, isPublish) => {
+    try {
+      setIsLoading(true);
+      setUpdateId(id);
+      const res = await patchData(
+        `/post/manager/update-is-publish?id=${id}`,
+        { isPublish },
+        {
+          timeout: 10000,
+          headers: {
+            "content-type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      setIsLoading(false);
+      setUpdateId(null);
+      setNum((prev) => prev + 1);
+      dispatch({
+        type: "NOTIFY",
+        payload: {
+          success: true,
+          message: res.message,
+        },
+      });
+    } catch (err) {
+      setUpdateId(null);
+      setIsLoading(false);
+      return dispatch({
+        type: "NOTIFY",
+        payload: {
+          success: false,
+          message: err.message,
+        },
+      });
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      dispatch({
+        type: "CONFIRM_MODAL",
+        payload: {
+          show: false,
+          message: "",
+          cb: null,
+        },
+      });
+      setIsLoading(true);
+      setDeleteId(id);
+      const res = await deleteData(`/post/manager/delete?id=${id}`, {
+        timeout: 10000,
+      });
+      setIsLoading(false);
+      setDeleteId(null);
+      setNum((prev) => prev + 1);
+      dispatch({
+        type: "NOTIFY",
+        payload: { success: true, message: res.message },
+      });
+    } catch (err) {
+      dispatch({
+        type: "NOTIFY",
+        payload: {
+          success: false,
+          message: err.message,
+        },
+      });
+    }
+  };
+
   return (
     <Layout>
       <Head>
@@ -47,6 +137,16 @@ function post() {
           <h1 className="card-title fs-3">Quản lý bài viết</h1>
         </Col>
       </Row>
+      <Row className="mb-3">
+        <Col xs={12} md={6} lg={4}>
+          <Link href="/manager/post/create" className="btn btn-dark my-3">Tạo bài viết mới</Link>
+          <Form.Select onChange={(e) => setSort(e.target.value)}>
+            <option value="">Sắp xếp</option>
+            <option value="desc">Ngày tạo: Mới nhất</option>
+            <option value="asc">Ngày tạo: Cũ nhất</option>
+          </Form.Select>
+        </Col>
+      </Row>
       <Row>
         <Col>
           <Table striped bordered responsive="xl">
@@ -62,8 +162,7 @@ function post() {
               </tr>
             </thead>
             <tbody>
-              {posts.map((post, index) => {
-                console.log(post);
+              {posts && posts.map((post, index) => {
                 return (
                   <tr>
                     <td className="align-middle text-center">{index + 1}</td>
@@ -81,19 +180,76 @@ function post() {
                       )}
                     </td>
                     <td className="align-middle text-center">
-                      {post.isPublish ? "Hiển thị" : "Ẩn"}
+                      {isLoading && updateId && updateId === post._id ? (
+                        <Suspense>
+                          <Spinner animation="grow" size="sm" />
+                        </Suspense>
+                      ) : post.isPublish ? (
+                        <Badge
+                          bg="info"
+                          onClick={() =>
+                            handleUpdateIsPublish(post._id, !post.isPublish)
+                          }
+                        >
+                          Hiển thị
+                        </Badge>
+                      ) : (
+                        <Badge
+                          bg="warning"
+                          text="dark"
+                          onClick={() =>
+                            handleUpdateIsPublish(post._id, !post.isPublish)
+                          }
+                        >
+                          Ẩn
+                        </Badge>
+                      )}
                     </td>
                     <td className="align-middle text-center">
                       {post.category?.name
                         ? post.category.name
                         : "Chưa có danh mục"}
                     </td>
-                    <td className="align-middle text-center">Hành động</td>
+                    <td className="align-middle text-center">
+                      <Button
+                        variant="danger"
+                        onClick={() =>
+                          dispatch({
+                            type: "CONFIRM_MODAL",
+                            payload: {
+                              show: true,
+                              message: "Bạn thực sự muốn xóa bài viết này chứ",
+                              cb: () => handleDelete(post._id),
+                            },
+                          })
+                        }
+                      >
+                        Xóa{" "}
+                        {isLoading && deleteId && deleteId === post._id && (
+                          <Suspense>
+                            <Spinner animation="grow" size="sm" />
+                          </Suspense>
+                        )}
+                      </Button>
+                      <Link
+                        href={`/manager/post/update/${post._id}`}
+                        className="btn btn-success ms-2"
+                      >
+                        Sửa
+                      </Link>
+                    </td>
                   </tr>
                 );
               })}
             </tbody>
           </Table>
+          <Pagina
+            size="md"
+            page={page}
+            count={count}
+            limit={limit}
+            setPage={setPage}
+          />
         </Col>
       </Row>
     </Layout>
