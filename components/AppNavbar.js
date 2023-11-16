@@ -56,6 +56,34 @@ function AppNavbar() {
                 >
                   Bài viết
                 </Link>
+                {user?.role === "admin" && (
+                  <>
+                    <Link
+                      className={`nav-link ${isActiveLink("/manager/post-category")}`}
+                      href={`/manager/post-category`}
+                    >
+                      Quản lý danh mục bài viết
+                    </Link>
+                    <Link
+                      className={`nav-link ${isActiveLink("/manager/tag")}`}
+                      href={`/manager/tag`}
+                    >
+                      Quản lý tag
+                    </Link>
+                    <Link
+                      className={`nav-link ${isActiveLink("/manager/post")}`}
+                      href={`/manager/post`}
+                    >
+                      Quản lý bài viết
+                    </Link>
+                    <Link
+                      className={`nav-link ${isActiveLink("/manager/user")}`}
+                      href={`/manager/user`}
+                    >
+                      Quản lý người dùng
+                    </Link>
+                  </>
+                )}
 
                 {Object.keys(user).length === 0 ? (
                   <Link
@@ -98,25 +126,6 @@ function AppNavbar() {
                       >
                         Hồ sơ
                       </Link>
-                      {user.role === "admin" && (
-                        <>
-                          <Link
-                            className="dropdown-item"
-                            href={`/manager/post-category`}
-                          >
-                            Danh mục bài viết
-                          </Link>
-                          <Link className="dropdown-item" href={`/manager/tag`}>
-                            Tag
-                          </Link>
-                          <Link
-                            className="dropdown-item"
-                            href={`/manager/post`}
-                          >
-                            Bài viết
-                          </Link>
-                        </>
-                      )}
                       <Dropdown.Divider />
                       <Dropdown.Item onClick={handleLogout}>
                         Đăng Xuất

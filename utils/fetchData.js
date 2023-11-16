@@ -58,6 +58,7 @@ instance.interceptors.response.use(
   async function (error) {
     // Bất kì mã trạng thái nào lọt ra ngoài tầm 2xx đều khiến hàm này được trigger\
     // Làm gì đó với lỗi response
+    console.log(error)
     const config = error.config;
     if (error?.response?.data?.message === "jwt expired" && !config?.sent) {
       config.sent = true;
