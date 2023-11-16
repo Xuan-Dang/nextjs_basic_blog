@@ -3,4 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
 };
 
-module.exports = { nextConfig };
+const env = {
+  BASE_WEB_URL: process.env.BASE_URL
+}
+
+module.exports = { nextConfig, env };

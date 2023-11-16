@@ -66,21 +66,14 @@ function post({ post, error }) {
           {/* Post image */}
           <div
             className="mt-3 mx-auto position-relative"
-            style={{
-              maxWidth: "600px",
-              width: "75vw",
-              minWidth: "250px",
-              maxHeight: "350px",
-              height: "45vw",
-              minHeight: "100px",
-              aspectRatio: "3/4"
-            }}
+            style={{ width: "clamp(250px, 50vw, 600px)", height: "clamp(100px, 40vw, 400px)" }}
           >
             <Image
               src={post?.image?.url}
               alt={post?.title}
               fill
               className="img-fluid img-thumbnail"
+              style={{objectFit: "cover"}}
             />
           </div>
           {/* End post image */}
@@ -88,6 +81,7 @@ function post({ post, error }) {
           {/* Post content */}
           <Card.Body
             className="p-0 mt-3"
+            id="post-content"
             dangerouslySetInnerHTML={{ __html: post.content }}
           ></Card.Body>
           {/* End post content */}

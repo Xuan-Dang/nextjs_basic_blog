@@ -26,10 +26,11 @@ const uploadData = (req, userRole, userId) => {
   return new Promise(async (resolve, reject) => {
     const form = new IncomingForm();
 
-    form.parse(req, (err, fields, files) => {
+    form.parse(req, async (err, fields, files) => {
       if (err) return reject(err);
 
       const { images } = files;
+      console.log(files)
       if (userRole !== "admin" && images.length > 1)
         return reject({
           code: 403,
@@ -37,19 +38,26 @@ const uploadData = (req, userRole, userId) => {
             "Bạn không phải admin, không thể tải lên nhiều hơn 1 ảnh cùng lúc",
         });
 
+      const uploadedImages = [];
       for (let image of images) {
         var oldPath = image.filepath;
         var newPath = `./public/images/${image.originalFilename}`;
-        Image.create({
+        const uploadedImage = await Image.create({
           url: `/images/${image.originalFilename}`,
           user: userId,
         });
+
+        const { createdAt, updatedAt, __v, ...newUploaedImage } =
+          uploadedImage._doc;
+
+        uploadedImages.push(newUploaedImage);
+
         mv(oldPath, newPath, function (err) {
           return reject(err);
         });
       }
 
-      resolve({ code: 200, message: "Tải ảnh lên thành công" });
+      resolve({ code: 200, message: "Tải ảnh lên thành công", images: uploadedImages });
     });
   });
 };

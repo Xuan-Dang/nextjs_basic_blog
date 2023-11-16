@@ -139,7 +139,9 @@ function post() {
       </Row>
       <Row className="mb-3">
         <Col xs={12} md={6} lg={4}>
-          <Link href="/manager/post/create" className="btn btn-dark my-3">Tạo bài viết mới</Link>
+          <Link href="/manager/post/create" className="btn btn-dark my-3">
+            Tạo bài viết mới
+          </Link>
           <Form.Select onChange={(e) => setSort(e.target.value)}>
             <option value="">Sắp xếp</option>
             <option value="desc">Ngày tạo: Mới nhất</option>
@@ -162,85 +164,131 @@ function post() {
               </tr>
             </thead>
             <tbody>
-              {posts && posts.map((post, index) => {
-                return (
-                  <tr>
-                    <td className="align-middle text-center">{index + 1}</td>
-                    <td className="align-middle">{post.title}</td>
-                    <td className="align-middle">{post.url}</td>
-                    <td className="align-middle text-center">
-                      {post?.image?.url && (
-                        <Image
-                          src={post.image.url}
-                          alt={post.image.alt}
-                          title={post.image.title}
-                          width={100}
-                          height={100}
-                        />
-                      )}
-                    </td>
-                    <td className="align-middle text-center">
-                      {isLoading && updateId && updateId === post._id ? (
-                        <Suspense>
-                          <Spinner animation="grow" size="sm" />
-                        </Suspense>
-                      ) : post.isPublish ? (
-                        <Badge
-                          bg="info"
-                          onClick={() =>
-                            handleUpdateIsPublish(post._id, !post.isPublish)
-                          }
-                        >
-                          Hiển thị
-                        </Badge>
-                      ) : (
-                        <Badge
-                          bg="warning"
-                          text="dark"
-                          onClick={() =>
-                            handleUpdateIsPublish(post._id, !post.isPublish)
-                          }
-                        >
-                          Ẩn
-                        </Badge>
-                      )}
-                    </td>
-                    <td className="align-middle text-center">
-                      {post.category?.name
-                        ? post.category.name
-                        : "Chưa có danh mục"}
-                    </td>
-                    <td className="align-middle text-center">
-                      <Button
-                        variant="danger"
-                        onClick={() =>
-                          dispatch({
-                            type: "CONFIRM_MODAL",
-                            payload: {
-                              show: true,
-                              message: "Bạn thực sự muốn xóa bài viết này chứ",
-                              cb: () => handleDelete(post._id),
-                            },
-                          })
-                        }
+              {posts &&
+                posts.map((post, index) => {
+                  return (
+                    <tr key={post._id}>
+                      <td className="align-middle text-center">{index + 1}</td>
+                      <td
+                        className="align-middle"
+                        style={{ maxWidth: "150px" }}
                       >
-                        Xóa{" "}
-                        {isLoading && deleteId && deleteId === post._id && (
+                        <p
+                          style={{
+                            display: "-webkit-box",
+                            maxWidth: "100%",
+                            WebkitLineClamp: "4",
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverFlow: "ellipsis",
+                          }}
+                        >
+                          {post.title}
+                        </p>
+                      </td>
+                      <td
+                        className="align-middle"
+                        style={{ maxWidth: "150px" }}
+                      >
+                        <p
+                          style={{
+                            display: "-webkit-box",
+                            maxWidth: "100%",
+                            WebkitLineClamp: "4",
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverFlow: "ellipsis",
+                          }}
+                        >
+                          {post.url}
+                        </p>
+                      </td>
+                      <td
+                        className="align-middle text-center"
+                        style={{ minWidth: "200px" }}
+                      >
+                        {post?.image?.url && (
+                          <span
+                            className="d-block position-relative"
+                            style={{ width: "100%", height: "100px" }}
+                          >
+                            <Image
+                              src={post.image.url}
+                              alt={
+                                post?.image?.alt
+                                  ? post.image.alt
+                                  : "Ảnh bài viết"
+                              }
+                              title={post.image.title}
+                              fill
+                              style={{ objectFit: "cover" }}
+                            />
+                          </span>
+                        )}
+                      </td>
+                      <td className="align-middle text-center">
+                        {isLoading && updateId && updateId === post._id ? (
                           <Suspense>
                             <Spinner animation="grow" size="sm" />
                           </Suspense>
+                        ) : post.isPublish ? (
+                          <Badge
+                            bg="info"
+                            onClick={() =>
+                              handleUpdateIsPublish(post._id, !post.isPublish)
+                            }
+                          >
+                            Hiển thị
+                          </Badge>
+                        ) : (
+                          <Badge
+                            bg="warning"
+                            text="dark"
+                            onClick={() =>
+                              handleUpdateIsPublish(post._id, !post.isPublish)
+                            }
+                          >
+                            Ẩn
+                          </Badge>
                         )}
-                      </Button>
-                      <Link
-                        href={`/manager/post/update/${post._id}`}
-                        className="btn btn-success ms-2"
-                      >
-                        Sửa
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                      <td className="align-middle text-center" style={{minWidth: "150px"}}>
+                        {post.category?.name
+                          ? post.category.name
+                          : "Chưa có danh mục"}
+                      </td>
+                      <td className="align-middle text-center" style={{minWidth: "150px"}}>
+                        <Button
+                          variant="danger"
+                          onClick={() =>
+                            dispatch({
+                              type: "CONFIRM_MODAL",
+                              payload: {
+                                show: true,
+                                message:
+                                  "Bạn thực sự muốn xóa bài viết này chứ",
+                                cb: () => handleDelete(post._id),
+                              },
+                            })
+                          }
+                        >
+                          Xóa{" "}
+                          {isLoading && deleteId && deleteId === post._id && (
+                            <Suspense>
+                              <Spinner animation="grow" size="sm" />
+                            </Suspense>
+                          )}
+                        </Button>
+                        <Link
+                          href={`/manager/post/update/${post._id}`}
+                          className="btn btn-success ms-2"
+                        >
+                          Sửa
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </Table>
           <Pagina

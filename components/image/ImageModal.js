@@ -41,7 +41,9 @@ function ImageModal() {
           "content-type": "multipart/form-data",
         },
       });
+
       setIsLoading(false);
+      
       setNum((prev) => {
         return prev + 1;
       });

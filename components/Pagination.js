@@ -71,6 +71,7 @@ function Pagina({ size, count, limit, page, setPage }) {
             active={page === item}
             disabled={item === "..."}
             onClick={() => getPage(item)}
+            key={item}
           >
             {item}
           </Pagination.Item>

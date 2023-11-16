@@ -1,3 +1,10 @@
 .ck.ck-content {
-    min-height: 400px;
+  min-height: 400px;
+}
+#post-content .image {
+    text-align: center;
+}
+#post-content .image img {
+  width: clamp(250px, 50vw, 600px) !important;
+  height: auto !important;
 }
