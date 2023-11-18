@@ -170,6 +170,13 @@ function update() {
         });
       });
 
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
     if (id) {
       getData(`/post/manager/${id}`, {
         timeout: 10000,
