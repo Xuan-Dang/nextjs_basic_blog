@@ -34,7 +34,18 @@ async function register(req, res) {
 
     const hashPassword = bcrypt.hashSync(req.body.password, salt);
 
-    const newUser = await User.create({ ...req.body, password: hashPassword });
+    const date = new Date(Date.now() + 30 * 60 * 1000);
+
+    await User.collection.createIndex(
+      { expireAt: 1 },
+      { expireAfterSeconds: 0 }
+    );
+
+    const newUser = await User.create({
+      ...req.body,
+      password: hashPassword,
+      expireAt: date,
+    });
 
     await sendVerifyEmail({ email: req.body.email, userId: newUser._id });
 
@@ -43,6 +54,7 @@ async function register(req, res) {
       message: "Đăng ký thành công",
     });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({
       code: 500,
       message: "Internal server error",

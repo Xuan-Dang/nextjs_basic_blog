@@ -54,6 +54,13 @@ async function login(req, res) {
       });
     }
 
+    if (!userByEmail.isActive)
+      return res.status(400).json({
+        code: 400,
+        message:
+          "Tài khoản của bạn đã bị khóa, vui lòng liên hệ admin để mở khóa",
+      });
+
     const {
       password,
       verifyToken,
@@ -73,6 +80,7 @@ async function login(req, res) {
       user: { ...user, accessToken, refreshToken },
     });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({
       code: 500,
       message: "Internal server error",

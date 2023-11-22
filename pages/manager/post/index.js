@@ -36,11 +36,11 @@ function post() {
       signal: controller.signal,
     })
       .then((data) => {
-        setPosts(data.posts);
-        setCount(data.count);
+        data?.posts && setPosts(data.posts);
+        data?.count && setCount(data.count);
       })
       .catch((err) => {
-        dispatch({
+        err && dispatch({
           type: "NOTIFY",
           payload: { success: false, message: err.message },
         });

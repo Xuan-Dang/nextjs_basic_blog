@@ -19,13 +19,17 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: "user",
     },
-    root: {
+    isActive: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     avatar: {
       type: String,
       default: "/images/default-user-avatar.png",
+    },
+    expireAt: {
+      type: Date,
+      default: 1
     },
     verifyToken: String,
     verifyTokenExpiry: Date,

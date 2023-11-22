@@ -30,7 +30,7 @@ async function get(req, res) {
 
     const users = await User.find(
       {},
-      "-__v -resetPasswordToken -resetPasswordTokenExpiry -verifyToken -verifyTokenExpiry"
+      "-__v -resetPasswordToken -resetPasswordTokenExpiry -verifyToken -verifyTokenExpiry -password"
     )
       .limit(limit)
       .skip(skip)

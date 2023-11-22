@@ -40,7 +40,7 @@ export const sendVerifyEmail = async ({ email, userId }) => {
 
     await User.findByIdAndUpdate(userId, {
       verifyToken: hashedToken,
-      verifyTokenExpiry: Date.now() + 360000,
+      verifyTokenExpiry: Date.now() + 30 * 60 * 1000,
     });
 
     const html = `

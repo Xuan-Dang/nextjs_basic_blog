@@ -31,6 +31,7 @@ async function verifyEmail(req, res) {
     user.isVerified = true;
     user.verifyToken = null;
     user.verifyTokenExpiry = null;
+    user.expireAt = null;
     await user.save();
 
     return res.status(200).json({
