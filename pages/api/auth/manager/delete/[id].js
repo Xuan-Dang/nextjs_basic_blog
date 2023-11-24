@@ -18,11 +18,13 @@ async function deleteById(req, res) {
     const { id } = req.query;
     const auth = await verifyAccessToken(req.headers);
     const { user } = auth;
+
     if (user.role !== "admin")
       return res.status(403).message({
         code: 403,
         message: "Bạn không có quyền xóa người dùng",
       });
+
     if (user._id.toString() === id)
       return res.status(400).json({
         code: 400,
@@ -30,6 +32,12 @@ async function deleteById(req, res) {
       });
 
     const userById = await User.findById(id);
+
+    if (userById?.expireAt)
+      return res.status(400).json({
+        code: 400,
+        message: "Người dùng này đã được lên lịch xóa",
+      });
 
     if (userById.isVerified) {
       const date = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
