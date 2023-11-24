@@ -1,6 +1,14 @@
 import Layout from "@/components/Layout";
 import { useEffect, useState, useContext, lazy, Suspense } from "react";
-import { Row, Col, Table, Button, Breadcrumb, Badge } from "react-bootstrap";
+import {
+  Row,
+  Col,
+  Table,
+  Button,
+  Breadcrumb,
+  Badge,
+  Form,
+} from "react-bootstrap";
 import Link from "next/link";
 import Head from "next/head";
 import { DataContext } from "@/context/AppProviders";
@@ -210,7 +218,7 @@ function userManager() {
     return () => {
       controller.abort();
     };
-  }, [page, num]);
+  }, [page, num, sort]);
 
   return (
     <Layout>
@@ -227,6 +235,15 @@ function userManager() {
             <Breadcrumb.Item active>Người dùng</Breadcrumb.Item>
           </Breadcrumb>
           <h1 className="card-title fs-3">Quản lý người dùng</h1>
+        </Col>
+      </Row>
+      <Row className="mb-3">
+        <Col xs={12} md={6} lg={4}>
+          <Form.Select onChange={(e) => setSort(e.target.value)}>
+            <option value="">Sắp xếp</option>
+            <option value="desc">Ngày đăng ký: Mới nhất</option>
+            <option value="asc">Ngày đăng ký: Cũ nhất</option>
+          </Form.Select>
         </Col>
       </Row>
       <Row>
@@ -359,6 +376,7 @@ function userManager() {
                                 },
                               })
                             }
+                            className="my-2"
                           >
                             Khóa tài khoản{" "}
                             {isLoading && user._id === blockId && (
@@ -381,6 +399,7 @@ function userManager() {
                                 },
                               })
                             }
+                            className="my-2"
                           >
                             Mở khóa tài khoản{" "}
                             {isLoading && user._id === blockId && (

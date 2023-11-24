@@ -29,7 +29,7 @@ function AppNavbar() {
   };
   return (
     <>
-      <Navbar key="lg" expand="lg" className="bg-body-tertiary mb-3">
+      <Navbar key="lg" expand="xl" className="bg-body-tertiary mb-3">
         <Container fluid>
           <Link className="navbar-brand" href="/">
             Nextjs Basic Blog
