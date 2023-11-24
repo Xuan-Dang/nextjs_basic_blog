@@ -7,6 +7,7 @@ import { Row, Col, Breadcrumb } from "react-bootstrap";
 import Link from "next/link";
 import PostItem from "@/components/post/PostItem";
 import { useEffect, useState, useContext } from "react";
+import Sidebar from "@/components/Sidebar";
 
 function posts({ posts, error }) {
   return (
@@ -48,9 +49,14 @@ function posts({ posts, error }) {
 
           {/* Post row */}
           <Row>
-            {posts.map((post) => (
-              <PostItem post={post} key={post._id} />
-            ))}
+            <Col xs={12} lg={8}>
+              <Row>
+                {posts.map((post) => (
+                  <PostItem post={post} key={post._id} />
+                ))}
+              </Row>
+            </Col>
+            <Sidebar />
           </Row>
           {/* End post row */}
         </>
@@ -64,7 +70,6 @@ export async function getServerSideProps() {
     const res = await getDataServerSide("/post", { timeout: 10000 });
     return { props: { posts: res?.posts ? res.posts : null } };
   } catch (err) {
-    console.log(err);
     return { props: { error: err ? err : null } };
   }
 }

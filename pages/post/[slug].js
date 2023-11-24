@@ -6,6 +6,7 @@ import Error from "@/components/Error";
 import { Card, Breadcrumb, Row, Col } from "react-bootstrap";
 import Link from "next/link";
 import Image from "next/image";
+import Sidebar from "@/components/Sidebar";
 
 function post({ post, error }) {
   const [publishedAt, setPublishedAt] = useState("");
@@ -28,89 +29,97 @@ function post({ post, error }) {
       {/* End error */}
 
       {/* Post */}
-      {post && (
-        <Card className="border-0 shadow-sm p-3">
-          {/* Breadcrumb */}
-          <Breadcrumb>
-            <Link href="/" className="breadcrumb-item">
-              Home
-            </Link>
-            <Link href="/post" className="breadcrumb-item">
-              Bài viết
-            </Link>
-            {post.category && post.category.name && (
-              <Link
-                href={`/category/${post.category._id}`}
-                className="breadcrumb-item"
-              >
-                {post.category.name}
-              </Link>
-            )}
-            <Breadcrumb.Item active>{post.title}</Breadcrumb.Item>
-          </Breadcrumb>
-          {/* End breadcrumb */}
-
-          {/* Page title */}
-          <h1 className="card-title">{post.title}</h1>
-          {/* End page title */}
-
-          {/* Subtitle */}
-          <Card.Subtitle
-            className="text-secondary"
-            style={{ fontWeight: "400", fontSize: "12px" }}
-          >
-            {post?.author?.fullName} - {publishedAt}
-          </Card.Subtitle>
-          {/* End subtitle */}
-
-          {/* Post image */}
-          <div
-            className="mt-3 mx-auto position-relative"
-            style={{ width: "clamp(250px, 50vw, 600px)", height: "clamp(100px, 40vw, 400px)" }}
-          >
-            <Image
-              src={post?.image?.url}
-              alt={post?.title}
-              fill
-              className="img-fluid img-thumbnail"
-              style={{objectFit: "cover"}}
-            />
-          </div>
-          {/* End post image */}
-
-          {/* Post content */}
-          <Card.Body
-            className="p-0 mt-3"
-            id="post-content"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          ></Card.Body>
-          {/* End post content */}
-
-          {/* Tags */}
-          {post.tags && post.tags.length > 0 && (
-            <div className="d-flex flex-wrap mt-2">
-              {post.tags.map((tag) => {
-                const { _id, name, url } = tag.tagId;
-                return (
+      <Row>
+        <Col xs={12} lg={8}>
+          {post && (
+            <Card className="border-0 shadow-sm p-3">
+              {/* Breadcrumb */}
+              <Breadcrumb>
+                <Link href="/" className="breadcrumb-item">
+                  Home
+                </Link>
+                <Link href="/post" className="breadcrumb-item">
+                  Bài viết
+                </Link>
+                {post.category && post.category.name && (
                   <Link
-                    href={`/tag/${url}.${_id}`}
-                    style={{
-                      display: "inline-block",
-                      width: "fit-content",
-                      fontSize: "13px",
-                      fontWeight: "300",
-                    }}
-                    className="p-1 btn btn-secondary rounded-0 me-1"
+                    href={`/category/${post.category._id}`}
+                    className="breadcrumb-item"
                   >
-                    {name}
+                    {post.category.name}
                   </Link>
-                );
-              })}
-            </div>
+                )}
+                <Breadcrumb.Item active>{post.title}</Breadcrumb.Item>
+              </Breadcrumb>
+              {/* End breadcrumb */}
+
+              {/* Page title */}
+              <h1 className="card-title">{post.title}</h1>
+              {/* End page title */}
+
+              {/* Subtitle */}
+              <Card.Subtitle
+                className="text-secondary"
+                style={{ fontWeight: "400", fontSize: "12px" }}
+              >
+                {post?.author?.fullName} - {publishedAt}
+              </Card.Subtitle>
+              {/* End subtitle */}
+
+              {/* Post image */}
+              <div
+                className="mt-3 mx-auto position-relative"
+                style={{
+                  width: "clamp(250px, 50vw, 600px)",
+                  height: "clamp(100px, 40vw, 400px)",
+                }}
+              >
+                <Image
+                  src={post?.image?.url}
+                  alt={post?.title}
+                  fill
+                  className="img-fluid img-thumbnail"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+              {/* End post image */}
+
+              {/* Post content */}
+              <Card.Body
+                className="p-0 mt-3"
+                id="post-content"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              ></Card.Body>
+              {/* End post content */}
+
+              {/* Tags */}
+              {post.tags && post.tags.length > 0 && (
+                <div className="d-flex flex-wrap mt-2">
+                  {post.tags.map((tag) => {
+                    const { _id, name, url } = tag.tagId;
+                    return (
+                      <Link
+                        href={`/tag/${url}.${_id}`}
+                        style={{
+                          display: "inline-block",
+                          width: "fit-content",
+                          fontSize: "13px",
+                          fontWeight: "300",
+                        }}
+                        className="p-1 btn btn-secondary rounded-0 me-1"
+                      >
+                        {name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+              {/* End tag */}
+            </Card>
           )}
-          {/* End tag */}
-        </Card>
-      )}
+        </Col>
+        <Sidebar />
+      </Row>
       {/* End post */}
     </Layout>
   );
