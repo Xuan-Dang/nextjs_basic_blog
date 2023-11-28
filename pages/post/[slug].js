@@ -107,6 +107,7 @@ function post({ post, error }) {
                           fontWeight: "300",
                         }}
                         className="p-1 btn btn-secondary rounded-0 me-1"
+                        key={_id}
                       >
                         {name}
                       </Link>
