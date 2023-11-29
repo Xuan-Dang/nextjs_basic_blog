@@ -198,6 +198,7 @@ function update() {
           post?.description && setValue("description", post.description);
           post?.content && setContent(post.content);
           post?.image && setImage({ ...post.image });
+          post?.isPublish && setIsPublish(post.isPublish);
         })
         .catch((err) => {
           return dispatch({
@@ -308,10 +309,10 @@ function update() {
               <Form.Label>Trạng thái</Form.Label>
               <Form.Select name="isPublish" onChange={handleSelectIsPublish}>
                 <option value="">Chọn trạng thái</option>
-                <option value={false} selected={post?.isPublish ? true : false}>
+                <option value={false} selected={!post.isPublish}>
                   Ẩn
                 </option>
-                <option value={true} selected={post?.isPublish ? true : false}>
+                <option value={true} selected={post.isPublish}>
                   Hiển thị
                 </option>
               </Form.Select>

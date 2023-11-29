@@ -43,7 +43,7 @@ function post({ post, error }) {
                 </Link>
                 {post.category && post.category.name && (
                   <Link
-                    href={`/category/${post.category._id}`}
+                    href={`/category/${post.category.url}.${post.category._id}`}
                     className="breadcrumb-item"
                   >
                     {post.category.name}

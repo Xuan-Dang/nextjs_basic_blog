@@ -41,7 +41,8 @@ function Sidebar() {
     };
   }, []);
 
-  const handleSearch = () => {
+  const handleSearch = (e) => {
+    e.preventDefault()
     router.push(`/post?search=${search}`);
   };
   return (
@@ -51,7 +52,7 @@ function Sidebar() {
           <Card.Title className="mb-0">Tìm kiếm</Card.Title>
         </Card.Header>
         <Card.Body>
-          <Form>
+          <Form onSubmit={handleSearch}>
             <Form.Group className="d-flex" controlId="search_post">
               <Form.Control
                 type="text"
@@ -64,7 +65,7 @@ function Sidebar() {
                 variant="dark"
                 className="rounded-0 shadow-none"
                 style={{ width: "30%" }}
-                onClick={handleSearch}
+                type="submit"
               >
                 Tìm kiếm
               </Button>
@@ -101,7 +102,7 @@ function Sidebar() {
               return (
                 <Link
                   href={`/tag/${tag.url}.${tag._id}`}
-                  className="d-block p-2 link-dark link-underline-opacity-0 link-underline-opacity-100-hover"
+                  className="d-inline p-2 link-dark link-underline-opacity-0 link-underline-opacity-100-hover"
                   key={tag._id}
                 >
                   {tag.name}
